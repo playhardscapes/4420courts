@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Navigation() {
@@ -20,8 +21,14 @@ export default function Navigation() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-bold text-green-600">
-            4420 Courts
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/4420courtslogo.png"
+              alt="4420 Courts"
+              width={150}
+              height={60}
+              className="h-12 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}
