@@ -55,10 +55,10 @@ export default function PlanningGuide() {
             <div className="bg-white rounded-lg shadow-md p-8">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Official Court Dimensions</h3>
               <div className="space-y-3">
-                <p><strong>Playing Area:</strong> 20' x 44'</p>
-                <p><strong>Recommended Total:</strong> 30' x 60'</p>
-                <p><strong>Minimum Total:</strong> 24' x 54'</p>
-                <p><strong>Net Height:</strong> 36" at ends, 34" at center</p>
+                <p><strong>Playing Area:</strong> 20&apos; x 44&apos;</p>
+                <p><strong>Recommended Total:</strong> 30&apos; x 60&apos;</p>
+                <p><strong>Minimum Total:</strong> 24&apos; x 54&apos;</p>
+                <p><strong>Net Height:</strong> 36&quot; at ends, 34&quot; at center</p>
               </div>
               <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
                 <p className="text-sm text-yellow-800">

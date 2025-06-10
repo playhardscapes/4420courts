@@ -21,10 +21,10 @@ export default function About() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Mission</h2>
             <p className="text-gray-700 text-lg leading-relaxed mb-4">
               Pickleball is the fastest-growing sport in America, and we believe every family should have access to a quality court right in their backyard. 
-              That's why we created 4420 Courts - to demystify the court building process and make it accessible to everyone.
+              That&apos;s why we created 4420 Courts - to demystify the court building process and make it accessible to everyone.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Whether you're a seasoned player looking for convenience or a newcomer excited to learn, we provide the knowledge, 
+              Whether you&apos;re a seasoned player looking for convenience or a newcomer excited to learn, we provide the knowledge, 
               tools, and guidance you need to make informed decisions about your court project.
             </p>
           </div>
@@ -32,7 +32,7 @@ export default function About() {
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Why 4420?</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              The name "4420" comes from the official pickleball court dimensions: 44 feet long by 20 feet wide. 
+              The name &quot;4420&quot; comes from the official pickleball court dimensions: 44 feet long by 20 feet wide. 
               These simple numbers represent the foundation of every great pickleball experience.
             </p>
             <p className="text-gray-700 leading-relaxed">
@@ -59,7 +59,7 @@ export default function About() {
               <div>
                 <h3 className="text-lg font-semibold text-orange-600 mb-3">Real-World Advice</h3>
                 <p className="text-gray-700 text-sm">
-                  Practical tips from actual court owners about what works, what doesn't, and what they wish they'd known.
+                  Practical tips from actual court owners about what works, what doesn&apos;t, and what they wish they&apos;d known.
                 </p>
               </div>
               <div>

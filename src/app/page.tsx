@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -76,7 +75,7 @@ export default function Home() {
             Ready to Build Your Dream Court?
           </h2>
           <p className="text-xl mb-8 text-green-100">
-            Join thousands of homeowners who've created their own backyard pickleball paradise.
+            Join thousands of homeowners who&apos;ve created their own backyard pickleball paradise.
           </p>
           <Link 
             href="/planning-guide" 

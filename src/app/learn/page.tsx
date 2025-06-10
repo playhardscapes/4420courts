@@ -35,8 +35,8 @@ export default function Learn() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">The Game</h3>
                 <ul className="text-gray-700 space-y-2">
-                  <li>• Played on a 20' x 44' court</li>
-                  <li>• Net is 36" high at ends, 34" at center</li>
+                  <li>• Played on a 20&apos; x 44&apos; court</li>
+                  <li>• Net is 36&quot; high at ends, 34&quot; at center</li>
                   <li>• Uses a perforated plastic ball (wiffle ball)</li>
                   <li>• Paddles are larger than ping pong, smaller than tennis</li>
                   <li>• Can be played singles or doubles</li>
@@ -47,7 +47,7 @@ export default function Learn() {
                 <ul className="text-gray-700 space-y-2">
                   <li>• Serve underhand, diagonally across court</li>
                   <li>• Ball must bounce once on each side before volleying</li>
-                  <li>• No volleying in the 7-foot "kitchen" zone</li>
+                  <li>• No volleying in the 7-foot &quot;kitchen&quot; zone</li>
                   <li>• Only serving team can score points</li>
                   <li>• Games typically played to 11, win by 2</li>
                 </ul>
@@ -126,7 +126,7 @@ export default function Learn() {
                     <p className="text-xs text-gray-600">Heavier = more power, Lighter = better control</p>
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-medium text-sm">Grip Size: 4-4.5"</p>
+                    <p className="font-medium text-sm">Grip Size: 4-4.5&quot;</p>
                     <p className="text-xs text-gray-600">Should feel comfortable in your hand</p>
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
@@ -157,7 +157,7 @@ export default function Learn() {
                   <li>• Dink shots keep the ball low and controlled</li>
                   <li>• Third shot drop is crucial for getting to net</li>
                   <li>• Avoid hitting hard shots from the kitchen</li>
-                  <li>• Aim for opponents' feet when they're at net</li>
+                  <li>• Aim for opponents&apos; feet when they&apos;re at net</li>
                 </ul>
               </div>
             </div>
@@ -168,7 +168,7 @@ export default function Learn() {
             <div className="bg-blue-50 rounded-lg p-8">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Ready to Build Your Court?</h3>
               <p className="text-gray-700 mb-6">
-                Now that you know the game, let's help you create the perfect place to play!
+                Now that you know the game, let&apos;s help you create the perfect place to play!
               </p>
               <Link 
                 href="/planning-guide"

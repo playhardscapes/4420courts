@@ -1,10 +1,10 @@
-import Link from "next/link";
+// import Link from "next/link";
 
 export default function Blog() {
   const blogPosts = [
     {
       title: "5 Things I Wish I Knew Before Building My Pickleball Court",
-      excerpt: "Real lessons learned from a homeowner's court building journey, including unexpected costs and design decisions.",
+      excerpt: "Real lessons learned from a homeowner&apos;s court building journey, including unexpected costs and design decisions.",
       date: "Coming Soon",
       slug: "things-i-wish-i-knew",
       category: "Planning"
@@ -90,7 +90,7 @@ export default function Blog() {
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8 text-center">
             <h2 className="text-xl font-semibold text-yellow-800 mb-2">Blog Coming Soon!</h2>
             <p className="text-yellow-700">
-              We're working on creating valuable content based on real homeowner experiences. 
+              We&apos;re working on creating valuable content based on real homeowner experiences. 
               Check back soon for practical tips and detailed guides.
             </p>
           </div>
