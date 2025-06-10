@@ -21,9 +21,12 @@ export default function Home() {
             </span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
-            <span className="text-blue-600">Keep Out</span> of the <span className="text-green-600">Kitchen</span>
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+            Looking to Build a New <span className="text-blue-600">Kitchen</span>?
           </h1>
+          <h2 className="text-2xl md:text-3xl font-medium text-gray-600 mb-6">
+            The Kind You <span className="text-green-600">Can't Step In</span>
+          </h2>
           
           <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-4xl mx-auto">
             We don&apos;t play pickleball - we build the courts where champions are made. 

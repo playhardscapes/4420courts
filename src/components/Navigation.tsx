@@ -11,8 +11,8 @@ export default function Navigation() {
     { href: "/", label: "Home" },
     { href: "/planning-guide", label: "Planning Guide" },
     { href: "/surface-options", label: "Surface Options" },
-    { href: "/learn", label: "Learn Pickleball" },
-    { href: "/blog", label: "Blog" },
+    { href: "/learn", label: "Court Construction" },
+    { href: "/blog", label: "Contractor Resources" },
     { href: "/about", label: "About" },
   ];
 
@@ -23,11 +23,11 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
-              src="/4420courtslogo.png"
+              src="/4420courtslogowtbg.png"
               alt="4420 Courts"
               width={150}
               height={60}
-              className="h-12 w-auto"
+              className="h-12 w-auto object-contain"
             />
           </Link>
 
