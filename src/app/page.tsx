@@ -13,24 +13,39 @@ export default function Home() {
       </section>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
+      <section className="relative py-20 px-4 overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-green-50">
+        {/* Floating background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-float"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-green-200 rounded-full opacity-20 animate-float" style={{animationDelay: '1s'}}></div>
+          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-yellow-200 rounded-full opacity-20 animate-float" style={{animationDelay: '2s'}}></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto text-center relative z-10">
           <div className="mb-8">
-            <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold">
+            <span className="bg-gradient-to-r from-blue-100 to-green-100 text-blue-800 px-6 py-3 rounded-full text-sm font-semibold shadow-lg">
               We Build Courts, Not Game Skills
             </span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
-            Looking to Build a New <span className="text-blue-600">Kitchen</span>?
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4 relative">
+            <span className="inline-block">Ready to build your</span>{' '}
+            <span className="text-blue-600 relative inline-block">
+              dream kitchen?
+            </span>
           </h1>
-          <h2 className="text-2xl md:text-3xl font-medium text-gray-600 mb-6">
-            The Kind You <span className="text-green-600">Can&apos;t Step In</span>
+          
+          <h2 className="text-2xl md:text-3xl font-medium text-gray-600 mb-6 relative">
+            <span className="inline-block">Where one step</span>{' '}
+            <span className="text-red-500 font-bold relative inline-block">
+              costs you a point
+              <span className="absolute -bottom-1 left-0 w-full h-1 bg-red-500 rounded-full"></span>
+            </span>
           </h2>
           
-          <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-4xl mx-auto">
-            We don&apos;t play pickleball - we build the courts where champions are made. 
-            Professional materials, expert guidance, and everything contractors need to build courts that last.
+          <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-4xl mx-auto leading-relaxed">
+            We don&apos;t play - we are <span className="text-blue-600 font-semibold">serious professional pickleball court builders</span> helping non-builders build better courts. 
+            Professional materials, expert guidance, and tutorials to keep the process <span className="text-green-600 font-semibold">inbounds</span>.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">

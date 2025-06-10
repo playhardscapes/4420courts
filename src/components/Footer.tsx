@@ -14,21 +14,22 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Navigation */}
           <div>
-            <h4 className="font-semibold mb-4">Planning</h4>
+            <h4 className="font-semibold mb-4">Navigation</h4>
             <ul className="space-y-2 text-sm">
+              <li><Link href="/" className="text-gray-300 hover:text-green-400">Home</Link></li>
               <li><Link href="/planning-guide" className="text-gray-300 hover:text-green-400">Planning Guide</Link></li>
               <li><Link href="/surface-options" className="text-gray-300 hover:text-green-400">Surface Options</Link></li>
-              <li><Link href="/blog" className="text-gray-300 hover:text-green-400">Blog</Link></li>
             </ul>
           </div>
 
-          {/* Learning */}
+          {/* Resources */}
           <div>
-            <h4 className="font-semibold mb-4">Learning</h4>
+            <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/learn" className="text-gray-300 hover:text-green-400">Learn Pickleball</Link></li>
+              <li><Link href="/learn" className="text-gray-300 hover:text-green-400">Court Construction</Link></li>
+              <li><Link href="/blog" className="text-gray-300 hover:text-green-400">Contractor Resources</Link></li>
               <li><Link href="/about" className="text-gray-300 hover:text-green-400">About</Link></li>
             </ul>
           </div>
