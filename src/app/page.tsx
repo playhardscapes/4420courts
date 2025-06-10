@@ -25,7 +25,7 @@ export default function Home() {
             Looking to Build a New <span className="text-blue-600">Kitchen</span>?
           </h1>
           <h2 className="text-2xl md:text-3xl font-medium text-gray-600 mb-6">
-            The Kind You <span className="text-green-600">Can't Step In</span>
+            The Kind You <span className="text-green-600">Can&apos;t Step In</span>
           </h2>
           
           <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-4xl mx-auto">
