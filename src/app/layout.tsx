@@ -3,6 +3,7 @@ import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -34,9 +35,11 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfairDisplay.variable} ${orbitron.variable} font-sans antialiased`}
       >
-        <Navigation />
-        <main>{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Navigation />
+          <main>{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

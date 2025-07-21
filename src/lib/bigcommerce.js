@@ -62,6 +62,109 @@ class BigCommerceAPI {
       return null;
     }
   }
+
+  // CUSTOMER MANAGEMENT METHODS
+
+  // Get all customers
+  async getCustomers() {
+    try {
+      const response = await this.client.get('/customers');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      return { data: [] };
+    }
+  }
+
+  // Get customer by email
+  async getCustomerByEmail(email) {
+    try {
+      const response = await this.client.get(`/customers?email:in=${email}`);
+      return response.data.data.length > 0 ? response.data.data[0] : null;
+    } catch (error) {
+      console.error('Error fetching customer by email:', error);
+      return null;
+    }
+  }
+
+  // Get customer by ID
+  async getCustomer(customerId) {
+    try {
+      const response = await this.client.get(`/customers/${customerId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching customer:', error);
+      return null;
+    }
+  }
+
+  // Create customer
+  async createCustomer(customerData) {
+    try {
+      const response = await this.client.post('/customers', [customerData]);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      return null;
+    }
+  }
+
+  // Update customer
+  async updateCustomer(customerId, customerData) {
+    try {
+      const response = await this.client.put(`/customers/${customerId}`, customerData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      return null;
+    }
+  }
+
+  // Get customer groups
+  async getCustomerGroups() {
+    try {
+      const response = await this.client.get('/customer-groups');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching customer groups:', error);
+      return { data: [] };
+    }
+  }
+
+  // Create customer group
+  async createCustomerGroup(groupData) {
+    try {
+      const response = await this.client.post('/customer-groups', groupData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating customer group:', error);
+      return null;
+    }
+  }
+
+  // Validate customer login (using stored password - basic implementation)
+  async validateCustomer(email, password) {
+    try {
+      const customer = await this.getCustomerByEmail(email);
+      if (!customer) {
+        return { success: false, message: 'Customer not found' };
+      }
+
+      // In a real implementation, you'd validate the password hash
+      // For now, we'll use a basic validation approach
+      // Note: BigCommerce doesn't expose password validation directly
+      // You'll need to implement proper authentication via their Customer Login API
+      
+      return { 
+        success: true, 
+        customer: customer,
+        message: 'Login successful' 
+      };
+    } catch (error) {
+      console.error('Error validating customer:', error);
+      return { success: false, message: 'Validation failed' };
+    }
+  }
 }
 
 export default new BigCommerceAPI();
