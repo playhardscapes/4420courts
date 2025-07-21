@@ -3,9 +3,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ShoppingCartIcon, XMarkIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 
+interface CartItem {
+  id: string;
+  name: string;
+  description?: string;
+  price: string;
+  images?: Array<{ url_standard: string }>;
+  inventory_level?: number;
+  quantity: number;
+}
+
 export default function Cart() {
   const [isOpen, setIsOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   // Load cart from localStorage on component mount
   useEffect(() => {
@@ -43,11 +53,11 @@ export default function Cart() {
     setIsOpen(true); // Show cart when item is added
   }, [cartItems]);
 
-  const removeFromCart = (productId) => {
+  const removeFromCart = (productId: string) => {
     setCartItems(cartItems.filter(item => item.id !== productId));
   };
 
-  const updateQuantity = (productId, newQuantity) => {
+  const updateQuantity = (productId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
       removeFromCart(productId);
     } else {
