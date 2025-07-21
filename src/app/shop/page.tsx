@@ -30,9 +30,18 @@ const productCategories = [
   }
 ];
 
+interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  price: string;
+  images?: Array<{ url_standard: string }>;
+  inventory_level?: number;
+}
+
 export default function ShopPage() {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,13 +117,13 @@ export default function ShopPage() {
     }
   };
 
-  const addToCart = async (product) => {
+  const addToCart = async (product: Product) => {
     if (typeof window !== 'undefined' && window.addToCart) {
       window.addToCart(product);
     }
   };
 
-  const getProductBadge = (product) => {
+  const getProductBadge = (product: Product) => {
     const name = product.name.toLowerCase();
     if (name.includes('consultation') || name.includes('training')) {
       return { text: 'Service', color: 'bg-blue-100 text-blue-800' };
