@@ -143,6 +143,7 @@ class BigCommerceAPI {
   }
 
   // Validate customer login (using stored password - basic implementation)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async validateCustomer(email, _password) {
     try {
       const customer = await this.getCustomerByEmail(email);
