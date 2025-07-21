@@ -15,7 +15,7 @@ export default function PlanningGuide() {
       {/* Hero */}
       <section className="bg-green-600 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6">
             Planning Your Perfect Pickleball Court
           </h1>
           <p className="text-xl text-green-100">
@@ -30,7 +30,7 @@ export default function PlanningGuide() {
           
           {/* Quick Start Checklist */}
           <div className="bg-white rounded-lg shadow-md p-8 mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Start Checklist</h2>
+            <h2 className="text-2xl font-bold font-heading text-gray-900 mb-6">Quick Start Checklist</h2>
             <div className="space-y-4">
               {[
                 "Measure your available space (minimum 20' x 44' needed)",
@@ -53,7 +53,7 @@ export default function PlanningGuide() {
           {/* Court Dimensions */}
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <div className="bg-white rounded-lg shadow-md p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Official Court Dimensions</h3>
+              <h3 className="text-xl font-bold font-heading text-gray-900 mb-4">Official Court Dimensions</h3>
               <div className="space-y-3">
                 <p><strong>Playing Area:</strong> 20&apos; x 44&apos;</p>
                 <p><strong>Recommended Total:</strong> 30&apos; x 60&apos;</p>
@@ -68,7 +68,7 @@ export default function PlanningGuide() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Budget Breakdown</h3>
+              <h3 className="text-xl font-bold font-heading text-gray-900 mb-4">Budget Breakdown</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>DIY Concrete Base:</span>
@@ -92,11 +92,11 @@ export default function PlanningGuide() {
 
           {/* Step by Step Guide */}
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Step-by-Step Planning Process</h2>
+            <h2 className="text-2xl font-bold font-heading text-gray-900 mb-6">Step-by-Step Planning Process</h2>
             
             <div className="space-y-8">
               <div className="border-l-4 border-green-500 pl-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">1. Site Assessment</h3>
+                <h3 className="text-lg font-semibold font-heading text-gray-900 mb-2">1. Site Assessment</h3>
                 <ul className="text-gray-700 space-y-1">
                   <li>• Measure your yard carefully</li>
                   <li>• Check for underground utilities (call 811)</li>
@@ -106,7 +106,7 @@ export default function PlanningGuide() {
               </div>
 
               <div className="border-l-4 border-blue-500 pl-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">2. Permits & Approvals</h3>
+                <h3 className="text-lg font-semibold font-heading text-gray-900 mb-2">2. Permits & Approvals</h3>
                 <ul className="text-gray-700 space-y-1">
                   <li>• Check local building codes</li>
                   <li>• Review HOA guidelines</li>
@@ -116,7 +116,7 @@ export default function PlanningGuide() {
               </div>
 
               <div className="border-l-4 border-orange-500 pl-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">3. Surface Selection</h3>
+                <h3 className="text-lg font-semibold font-heading text-gray-900 mb-2">3. Surface Selection</h3>
                 <ul className="text-gray-700 space-y-1">
                   <li>• Concrete: Most durable, professional feel</li>
                   <li>• Asphalt: Cost-effective, good performance</li>
@@ -126,7 +126,7 @@ export default function PlanningGuide() {
               </div>
 
               <div className="border-l-4 border-purple-500 pl-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">4. Getting Quotes</h3>
+                <h3 className="text-lg font-semibold font-heading text-gray-900 mb-2">4. Getting Quotes</h3>
                 <ul className="text-gray-700 space-y-1">
                   <li>• Get 3+ contractor estimates</li>
                   <li>• Compare materials and warranties</li>
@@ -140,7 +140,7 @@ export default function PlanningGuide() {
           {/* CTA */}
           <div className="text-center mt-12">
             <div className="bg-green-50 rounded-lg p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Ready for the Next Step?</h3>
+              <h3 className="text-xl font-bold font-heading text-gray-900 mb-4">Ready for the Next Step?</h3>
               <p className="text-gray-700 mb-6">
                 Learn about different surface options and find the perfect match for your needs and budget.
               </p>

@@ -3,17 +3,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import Cart from "./Cart";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/planning-guide", label: "Planning Guide" },
-    { href: "/surface-options", label: "Surface Options" },
-    { href: "/learn", label: "Court Construction" },
-    { href: "/blog", label: "Contractor Resources" },
-    { href: "/about", label: "About" },
+    { href: "/process", label: "Our Process" },
+    { href: "/services", label: "Services" },
+    { href: "/labs", label: "Our Lab" },
+    { href: "/shop", label: "Shop" },
+    { href: "/portfolio", label: "Our Builds" },
+    // { href: "/franchise", label: "Franchise" }, // Coming later
+    { href: "/contact", label: "Contact" },
+    { href: "/members", label: "Members" },
+    { href: "/login", label: "Login" },
   ];
 
   return (
@@ -23,7 +27,7 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
-              src="/4420courtslogowtbg.png"
+              src="/4420courtslogowide.jpg"
               alt="4420 Courts"
               width={150}
               height={60}
@@ -32,7 +36,7 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -42,6 +46,7 @@ export default function Navigation() {
                 {item.label}
               </Link>
             ))}
+            <Cart />
           </div>
 
           {/* Mobile Menu Button */}

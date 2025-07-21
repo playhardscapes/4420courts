@@ -85,19 +85,28 @@
 
 ## 🔧 **Website Implementation Completed**
 
-### **Hero Section Updates**
-- Updated messaging: "Ready to build your dream kitchen? Where one step costs you a point."
-- Professional positioning: "We don't play - we are serious professional pickleball court builders helping non-builders build better courts"
-- Added tennis pun: "keep the process inbounds"
-- Reduced excessive animations for professional feel
-- Updated footer navigation to match header structure
+### **Latest Updates - January 2025**
+- **BigCommerce Integration**: Headless commerce with REST API ($39/month plan)
+- **Shopping Cart**: Full cart functionality with persistent storage
+- **Service Levels**: Updated to new pricing model (Free/$49.99/month/project-based)
+- **Product Categories**: Auto-categorization (Services/Physical/Digital)
+- **Spy Agency Font**: Orbitron font for all headings matching logo style
+- **Navigation**: Added cart icon, removed Home button, updated labels
 
-### **Technical Changes**
-- Custom CSS animations in globals.css
-- Updated page.tsx with new hero messaging
-- Updated Footer.tsx navigation structure
-- Added dedicated YouTube channel section with modern design
-- Maintained clean, professional design
+### **Service Levels Framework**
+- **Level 1**: Free DIY Resources ($0) - Downloadable materials, video library
+- **Level 2**: Monthly Membership ($49.99/month) - Zoom consultations, community access  
+- **Level 3**: Coating & Lining Specialist ($10,000-15,000)
+- **Level 4**: Project Management + Finish ($15,000-25,000)
+- **Level 5**: Full Project Management ($30,000-45,000)
+- **Level 5.5**: Premium Personalized (Contact for Pricing)
+
+### **Technical Architecture**
+- **Frontend**: Next.js 15 with TypeScript and Tailwind CSS
+- **Commerce**: BigCommerce headless integration
+- **Deployment**: Railway (auto-deploy from GitHub)
+- **Fonts**: Orbitron (headings), Inter (body), Playfair Display (serif)
+- **Cart**: Local storage with persistent state management
 
 ## 🚀 **Git Repository Management**
 
@@ -107,7 +116,7 @@ This project uses its own dedicated repository at: `https://github.com/playhards
 ### **Push Process for 4420-Courts Only**
 ```bash
 # Navigate to 4420-courts directory
-cd /home/phadmin/play-hardscapes/4420-courts
+cd /home/info4420/github/4420courts
 
 # Check git status
 git status

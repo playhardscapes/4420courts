@@ -15,7 +15,7 @@ export default function SurfaceOptions() {
       {/* Hero */}
       <section className="bg-orange-600 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6">
             Court Surface Options
           </h1>
           <p className="text-xl text-orange-100">
@@ -31,7 +31,7 @@ export default function SurfaceOptions() {
           {/* Quick Comparison Table */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-12">
             <div className="p-6 bg-gray-50 border-b">
-              <h2 className="text-2xl font-bold text-gray-900">Surface Comparison</h2>
+              <h2 className="text-2xl font-bold font-heading text-gray-900">Surface Comparison</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -83,10 +83,10 @@ export default function SurfaceOptions() {
             
             {/* Concrete */}
             <div className="bg-white rounded-lg shadow-md p-8">
-              <h3 className="text-xl font-bold text-green-600 mb-4">Concrete Courts</h3>
+              <h3 className="text-xl font-bold font-heading text-green-600 mb-4">Concrete Courts</h3>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Pros:</h4>
+                  <h4 className="font-semibold font-heading text-gray-900 mb-2">Pros:</h4>
                   <ul className="text-gray-700 text-sm space-y-1">
                     <li>• Most durable surface option</li>
                     <li>• Professional tournament feel</li>
@@ -96,7 +96,7 @@ export default function SurfaceOptions() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Cons:</h4>
+                  <h4 className="font-semibold font-heading text-gray-900 mb-2">Cons:</h4>
                   <ul className="text-gray-700 text-sm space-y-1">
                     <li>• Highest upfront cost</li>
                     <li>• Requires professional installation</li>
@@ -114,10 +114,10 @@ export default function SurfaceOptions() {
 
             {/* Asphalt */}
             <div className="bg-white rounded-lg shadow-md p-8">
-              <h3 className="text-xl font-bold text-blue-600 mb-4">Asphalt Courts</h3>
+              <h3 className="text-xl font-bold font-heading text-blue-600 mb-4">Asphalt Courts</h3>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Pros:</h4>
+                  <h4 className="font-semibold font-heading text-gray-900 mb-2">Pros:</h4>
                   <ul className="text-gray-700 text-sm space-y-1">
                     <li>• Good balance of cost and performance</li>
                     <li>• Faster installation than concrete</li>
@@ -127,7 +127,7 @@ export default function SurfaceOptions() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Cons:</h4>
+                  <h4 className="font-semibold font-heading text-gray-900 mb-2">Cons:</h4>
                   <ul className="text-gray-700 text-sm space-y-1">
                     <li>• Shorter lifespan than concrete</li>
                     <li>• Can crack in extreme temperatures</li>
@@ -145,10 +145,10 @@ export default function SurfaceOptions() {
 
             {/* Modular Tiles */}
             <div className="bg-white rounded-lg shadow-md p-8">
-              <h3 className="text-xl font-bold text-purple-600 mb-4">Modular Tile Systems</h3>
+              <h3 className="text-xl font-bold font-heading text-purple-600 mb-4">Modular Tile Systems</h3>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Pros:</h4>
+                  <h4 className="font-semibold font-heading text-gray-900 mb-2">Pros:</h4>
                   <ul className="text-gray-700 text-sm space-y-1">
                     <li>• DIY-friendly installation</li>
                     <li>• No excavation required</li>
@@ -158,7 +158,7 @@ export default function SurfaceOptions() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Cons:</h4>
+                  <h4 className="font-semibold font-heading text-gray-900 mb-2">Cons:</h4>
                   <ul className="text-gray-700 text-sm space-y-1">
                     <li>• Shorter lifespan</li>
                     <li>• Ball bounce may vary</li>
@@ -176,10 +176,10 @@ export default function SurfaceOptions() {
 
             {/* Sport Court */}
             <div className="bg-white rounded-lg shadow-md p-8">
-              <h3 className="text-xl font-bold text-orange-600 mb-4">Sport Court Systems</h3>
+              <h3 className="text-xl font-bold font-heading text-orange-600 mb-4">Sport Court Systems</h3>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Pros:</h4>
+                  <h4 className="font-semibold font-heading text-gray-900 mb-2">Pros:</h4>
                   <ul className="text-gray-700 text-sm space-y-1">
                     <li>• Multi-sport versatility</li>
                     <li>• Shock absorption (joint-friendly)</li>
@@ -189,7 +189,7 @@ export default function SurfaceOptions() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Cons:</h4>
+                  <h4 className="font-semibold font-heading text-gray-900 mb-2">Cons:</h4>
                   <ul className="text-gray-700 text-sm space-y-1">
                     <li>• Higher cost than basic options</li>
                     <li>• Requires specific base preparation</li>
@@ -208,10 +208,10 @@ export default function SurfaceOptions() {
 
           {/* Installation Tips */}
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Installation Considerations</h2>
+            <h2 className="text-2xl font-bold font-heading text-gray-900 mb-6">Installation Considerations</h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Site Preparation</h3>
+                <h3 className="text-lg font-semibold font-heading text-gray-900 mb-4">Site Preparation</h3>
                 <ul className="text-gray-700 space-y-2">
                   <li>• Proper drainage is crucial for all surfaces</li>
                   <li>• Level base prevents water pooling</li>
@@ -220,7 +220,7 @@ export default function SurfaceOptions() {
                 </ul>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Professional vs. DIY</h3>
+                <h3 className="text-lg font-semibold font-heading text-gray-900 mb-4">Professional vs. DIY</h3>
                 <ul className="text-gray-700 space-y-2">
                   <li>• Concrete/asphalt: Always hire professionals</li>
                   <li>• Modular tiles: Good DIY option</li>
@@ -234,7 +234,7 @@ export default function SurfaceOptions() {
           {/* CTA */}
           <div className="text-center mt-12">
             <div className="bg-orange-50 rounded-lg p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Ready to Choose Your Surface?</h3>
+              <h3 className="text-xl font-bold font-heading text-gray-900 mb-4">Ready to Choose Your Surface?</h3>
               <p className="text-gray-700 mb-6">
                 Use our planning guide to start mapping out your perfect court project.
               </p>

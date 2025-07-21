@@ -4,7 +4,7 @@ export default function About() {
       {/* Hero */}
       <section className="bg-gray-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6">
             About 4420 Courts
           </h1>
           <p className="text-xl text-gray-300">
@@ -18,7 +18,7 @@ export default function About() {
         <div className="max-w-4xl mx-auto">
           
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Mission</h2>
+            <h2 className="text-2xl font-bold font-heading text-gray-900 mb-6">Our Mission</h2>
             <p className="text-gray-700 text-lg leading-relaxed mb-4">
               Pickleball is the fastest-growing sport in America, and we believe every family should have access to a quality court right in their backyard. 
               That&apos;s why we created 4420 Courts - to demystify the court building process and make it accessible to everyone.
@@ -30,7 +30,7 @@ export default function About() {
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Why 4420?</h2>
+            <h2 className="text-2xl font-bold font-heading text-gray-900 mb-6">Why 4420?</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               The name &quot;4420&quot; comes from the official pickleball court dimensions: 44 feet long by 20 feet wide. 
               These simple numbers represent the foundation of every great pickleball experience.
@@ -42,28 +42,28 @@ export default function About() {
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">What We Offer</h2>
+            <h2 className="text-2xl font-bold font-heading text-gray-900 mb-6">What We Offer</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-green-600 mb-3">Comprehensive Guides</h3>
+                <h3 className="text-lg font-semibold font-heading text-green-600 mb-3">Comprehensive Guides</h3>
                 <p className="text-gray-700 text-sm">
                   Step-by-step planning guides, surface comparisons, and budget breakdowns to help you make informed decisions.
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-blue-600 mb-3">Educational Content</h3>
+                <h3 className="text-lg font-semibold font-heading text-blue-600 mb-3">Educational Content</h3>
                 <p className="text-gray-700 text-sm">
                   Learn the game, improve your skills, and understand equipment so you can maximize your court investment.
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-orange-600 mb-3">Real-World Advice</h3>
+                <h3 className="text-lg font-semibold font-heading text-orange-600 mb-3">Real-World Advice</h3>
                 <p className="text-gray-700 text-sm">
                   Practical tips from actual court owners about what works, what doesn&apos;t, and what they wish they&apos;d known.
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-purple-600 mb-3">Community Focus</h3>
+                <h3 className="text-lg font-semibold font-heading text-purple-600 mb-3">Community Focus</h3>
                 <p className="text-gray-700 text-sm">
                   Resources for families, neighborhoods, and communities looking to bring people together through pickleball.
                 </p>
