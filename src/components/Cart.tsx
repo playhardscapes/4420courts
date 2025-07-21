@@ -20,7 +20,14 @@ export default function Cart() {
     localStorage.setItem('4420courts-cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = useCallback((product) => {
+  const addToCart = useCallback((product: {
+    id: string;
+    name: string;
+    description?: string;
+    price: string;
+    images?: Array<{ url_standard: string }>;
+    inventory_level?: number;
+  }) => {
     const existingItem = cartItems.find(item => item.id === product.id);
     
     if (existingItem) {
