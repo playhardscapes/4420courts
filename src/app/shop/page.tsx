@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ShoppingCartIcon, AcademicCapIcon, WrenchScrewdriverIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
 
 const productCategories = [
@@ -50,7 +50,7 @@ export default function ShopPage() {
     fetchProducts();
   }, []);
 
-  const filterProducts = () => {
+  const filterProducts = useCallback(() => {
     if (selectedCategory === 'all') {
       setFilteredProducts(products);
     } else {
@@ -94,11 +94,11 @@ export default function ShopPage() {
       });
       setFilteredProducts(filtered);
     }
-  };
+  }, [products, selectedCategory]);
 
   useEffect(() => {
     filterProducts();
-  }, [products, selectedCategory]);
+  }, [filterProducts]);
 
   const fetchProducts = async () => {
     try {
