@@ -143,7 +143,7 @@ class BigCommerceAPI {
   }
 
   // Validate customer login (using stored password - basic implementation)
-  async validateCustomer(email, password) {
+  async validateCustomer(email, _password) {
     try {
       const customer = await this.getCustomerByEmail(email);
       if (!customer) {

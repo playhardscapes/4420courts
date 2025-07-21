@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         return { success: false, error: data.error };
       }
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Login failed' };
     }
   };
@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         return { success: false, error: data.error };
       }
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Registration failed' };
     }
   };
