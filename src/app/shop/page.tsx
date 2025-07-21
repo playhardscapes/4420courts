@@ -55,7 +55,7 @@ export default function ShopPage() {
       } else {
         setProducts(data.data || []);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to load products');
     } finally {
       setLoading(false);
