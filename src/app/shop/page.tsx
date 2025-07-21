@@ -50,27 +50,6 @@ export default function ShopPage() {
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    filterProducts();
-  }, [products, selectedCategory]);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch('/api/products');
-      const data = await response.json();
-      
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setProducts(data.data || []);
-      }
-    } catch {
-      setError('Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const filterProducts = () => {
     if (selectedCategory === 'all') {
       setFilteredProducts(products);
@@ -114,6 +93,27 @@ export default function ShopPage() {
         }
       });
       setFilteredProducts(filtered);
+    }
+  };
+
+  useEffect(() => {
+    filterProducts();
+  }, [products, selectedCategory]);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products');
+      const data = await response.json();
+      
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setProducts(data.data || []);
+      }
+    } catch {
+      setError('Failed to load products');
+    } finally {
+      setLoading(false);
     }
   };
 

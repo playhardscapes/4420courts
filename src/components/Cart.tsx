@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ShoppingCartIcon, XMarkIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 export default function Cart() {
@@ -20,7 +20,7 @@ export default function Cart() {
     localStorage.setItem('4420courts-cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product) => {
+  const addToCart = useCallback((product) => {
     const existingItem = cartItems.find(item => item.id === product.id);
     
     if (existingItem) {
@@ -34,7 +34,7 @@ export default function Cart() {
     }
     
     setIsOpen(true); // Show cart when item is added
-  };
+  }, [cartItems]);
 
   const removeFromCart = (productId) => {
     setCartItems(cartItems.filter(item => item.id !== productId));
@@ -63,7 +63,7 @@ export default function Cart() {
   // Make addToCart function available globally
   useEffect(() => {
     window.addToCart = addToCart;
-  }, [cartItems]);
+  }, [addToCart]);
 
   return (
     <>
