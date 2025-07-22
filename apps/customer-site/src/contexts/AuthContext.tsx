@@ -43,22 +43,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setUser(data.customer);
-        localStorage.setItem('4420courts-user', JSON.stringify(data.customer));
+      // Temporary demo login - replace with real authentication later
+      if (email === 'demo@4420courts.com' && password === 'demo123') {
+        const demoUser = {
+          id: 1,
+          email: 'demo@4420courts.com',
+          first_name: 'Demo',
+          last_name: 'User',
+          membershipLevel: 'monthly'
+        };
+        setUser(demoUser);
+        localStorage.setItem('4420courts-user', JSON.stringify(demoUser));
         return { success: true };
       } else {
-        return { success: false, error: data.error };
+        return { success: false, error: 'Invalid credentials. Try demo@4420courts.com / demo123' };
       }
     } catch {
       return { success: false, error: 'Login failed' };
@@ -73,23 +71,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     membershipLevel?: string;
   }) => {
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setUser(data.customer);
-        localStorage.setItem('4420courts-user', JSON.stringify(data.customer));
-        return { success: true };
-      } else {
-        return { success: false, error: data.error };
-      }
+      // Temporary demo registration - replace with real registration later
+      const newUser = {
+        id: Date.now(),
+        email: userData.email,
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        membershipLevel: userData.membershipLevel || 'free'
+      };
+      setUser(newUser);
+      localStorage.setItem('4420courts-user', JSON.stringify(newUser));
+      return { success: true };
     } catch {
       return { success: false, error: 'Registration failed' };
     }
