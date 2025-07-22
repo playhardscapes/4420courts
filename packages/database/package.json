@@ -1,0 +1,24 @@
+{
+  "name": "@4420courts/database",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@4420courts/shared": "workspace:*",
+    "drizzle-orm": "^0.33.0",
+    "postgres": "^3.4.0",
+    "@types/postgres": "^3.0.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.24.0",
+    "typescript": "^5"
+  }
+}

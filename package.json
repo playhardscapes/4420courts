@@ -1,34 +1,30 @@
 {
-  "name": "4420-courts",
-  "version": "0.1.0",
+  "name": "4420courts-monorepo",
+  "version": "1.0.0",
   "private": true,
+  "description": "4420 Courts customer site and dealer portal monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "watch": "nodemon --exec 'npm run build && npm run start' --watch src --ext tsx,ts,js,jsx,css"
-  },
-  "dependencies": {
-    "@bigcommerce/checkout-sdk": "^1.770.0",
-    "@heroicons/react": "^2.2.0",
-    "autoprefixer": "^10.4.21",
-    "axios": "^1.10.0",
-    "next": "15.3.3",
-    "node-bigcommerce": "^4.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean",
+    "dev:customer": "cd apps/customer-site && npm run dev",
+    "dev:dealer": "cd apps/dealer-portal && npm run dev",
+    "build:customer": "cd apps/customer-site && npm run build",
+    "build:dealer": "cd apps/dealer-portal && npm run build"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.3",
-    "nodemon": "^3.1.10",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "turbo": "^2.3.0",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
