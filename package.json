@@ -3,28 +3,23 @@
   "version": "1.0.0",
   "private": true,
   "description": "4420 Courts customer site and dealer portal monorepo",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "start": "turbo run start",
-    "lint": "turbo run lint",
-    "type-check": "turbo run type-check",
-    "clean": "turbo run clean",
     "dev:customer": "cd apps/customer-site && npm run dev",
     "dev:dealer": "cd apps/dealer-portal && npm run dev",
     "build:customer": "cd apps/customer-site && npm run build",
-    "build:dealer": "cd apps/dealer-portal && npm run build"
+    "build:dealer": "cd apps/dealer-portal && npm run build",
+    "install:all": "cd apps/customer-site && npm install && cd ../dealer-portal && npm install",
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:reset": "prisma db push --force-reset && npm run db:seed"
   },
-  "devDependencies": {
-    "turbo": "^2.3.0",
-    "@types/node": "^18.0.0",
-    "typescript": "^5.0.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+  "dependencies": {
+    "@prisma/client": "^6.12.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/pg": "^8.15.4",
+    "bcryptjs": "^3.0.2",
+    "pg": "^8.16.3",
+    "prisma": "^6.12.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

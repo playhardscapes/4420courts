@@ -19,9 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@4420courts/shared": ["../../packages/shared/src"],
-      "@4420courts/database": ["../../packages/database/src"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

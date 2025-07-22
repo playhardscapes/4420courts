@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build",
+    "build": "SKIP_ENV_VALIDATION=true next build",
     "start": "next start -p 3000",
     "lint": "next lint",
     "type-check": "tsc --noEmit"
@@ -12,8 +12,6 @@
   "dependencies": {
     "@bigcommerce/checkout-sdk": "^1.770.0",
     "@heroicons/react": "^2.2.0",
-    "@4420courts/shared": "workspace:*",
-    "@4420courts/database": "workspace:*",
     "autoprefixer": "^10.4.21",
     "axios": "^1.10.0",
     "next": "15.3.3",
