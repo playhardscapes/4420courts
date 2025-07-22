@@ -6,7 +6,7 @@
   "scripts": {
     "dev:customer": "cd apps/customer-site && npm run dev",
     "dev:dealer": "cd apps/dealer-portal && npm run dev",
-    "build": "cd apps/customer-site && npm install && npm run build",
+    "build": "cd apps/customer-site && npm ci && npm run build",
     "start": "cd apps/customer-site && npm start",
     "build:customer": "cd apps/customer-site && npm run build",
     "build:dealer": "cd apps/dealer-portal && npm run build",
