@@ -1,7 +1,6 @@
-[[services]]
-name = "customer-site"
-source = "apps/customer-site"
+[build]
+builder = "NIXPACKS"
 
-[[services]]
-name = "dealer-portal"  
-source = "apps/dealer-portal"
+[deploy]
+startCommand = "cd apps/customer-site && npm start"
+healthcheckPath = "/"
