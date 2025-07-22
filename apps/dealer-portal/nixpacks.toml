@@ -1,0 +1,8 @@
+[build.env]
+SKIP_ENV_VALIDATION = "true"
+
+[build]
+cmd = "npm run build"
+
+[start]
+cmd = "npm start"
