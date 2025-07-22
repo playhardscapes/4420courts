@@ -10,12 +10,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@bigcommerce/checkout-sdk": "^1.770.0",
     "@heroicons/react": "^2.2.0",
     "autoprefixer": "^10.4.21",
-    "axios": "^1.10.0",
     "next": "15.3.3",
-    "node-bigcommerce": "^4.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

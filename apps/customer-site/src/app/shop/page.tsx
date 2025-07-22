@@ -102,14 +102,35 @@ export default function ShopPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products');
-      const data = await response.json();
+      // Temporary static products until we build the full system
+      const staticProducts = [
+        {
+          id: '1',
+          name: 'Complete Court Resurfacing Kit',
+          description: '20x 5-gallon buckets (4 gallons material each) - 80 gallons total covers one court',
+          price: '$1,395.00',
+          images: [{ url_standard: '/4420courtslogowide.jpg' }],
+          inventory_level: 25
+        },
+        {
+          id: '2', 
+          name: 'Professional Consultation - 1 Hour',
+          description: 'Expert guidance for your court resurfacing project',
+          price: '$150.00',
+          images: [{ url_standard: '/4420courtslogowide.jpg' }],
+          inventory_level: 999
+        },
+        {
+          id: '3',
+          name: 'Emergency Support Package',
+          description: 'Same-day troubleshooting and problem resolution',
+          price: '$200.00', 
+          images: [{ url_standard: '/4420courtslogowide.jpg' }],
+          inventory_level: 999
+        }
+      ];
       
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setProducts(data.data || []);
-      }
+      setProducts(staticProducts);
     } catch {
       setError('Failed to load products');
     } finally {
