@@ -1,8 +1,0 @@
-[variables]
-SKIP_ENV_VALIDATION = "true"
-
-[phases.build]
-cmd = "npm run build"
-
-[phases.start]
-cmd = "npm start"

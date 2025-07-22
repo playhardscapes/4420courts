@@ -2,24 +2,6 @@
 name = "customer-site"
 source = "apps/customer-site"
 
-[services.build]
-builder = "NIXPACKS"
-
-[services.deploy]
-healthcheckPath = "/"
-healthcheckTimeout = 100
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 10
-
 [[services]]
 name = "dealer-portal"  
 source = "apps/dealer-portal"
-
-[services.build]
-builder = "NIXPACKS"
-
-[services.deploy]
-healthcheckPath = "/"
-healthcheckTimeout = 100
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 10
