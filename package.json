@@ -6,11 +6,15 @@
   "scripts": {
     "dev:customer": "cd apps/customer-site && npm run dev",
     "dev:dealer": "cd apps/dealer-portal && npm run dev",
-    "build": "cd apps/customer-site && npm ci && npm run build",
+    "build": "npm run install:all && npm run build:customer",
     "start": "cd apps/customer-site && npm start",
     "build:customer": "cd apps/customer-site && npm run build",
     "build:dealer": "cd apps/dealer-portal && npm run build",
-    "install:all": "cd apps/customer-site && npm install && cd ../dealer-portal && npm install",
+    "install:all": "cd apps/customer-site && npm ci && cd ../dealer-portal && npm ci",
+    "lint": "cd apps/customer-site && npm run lint && cd ../dealer-portal && npm run lint",
+    "type-check": "cd apps/customer-site && npm run type-check && cd ../dealer-portal && npm run type-check",
+    "test": "cd apps/customer-site && npm test && cd ../dealer-portal && npm test",
+    "test:watch": "cd apps/customer-site && npm run test:watch",
     "db:seed": "ts-node prisma/seed.ts",
     "db:reset": "prisma db push --force-reset && npm run db:seed"
   },

@@ -16,6 +16,15 @@ interface CartItem {
 export default function Cart() {
   const [isOpen, setIsOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [customerInfo, setCustomerInfo] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    requestedDate: ''
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Load cart from localStorage on component mount
   useEffect(() => {
@@ -74,7 +83,55 @@ export default function Cart() {
   };
 
   const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.quantity), 0).toFixed(2);
+    return cartItems.reduce((total, item) => total + (parseFloat(item.price.replace('$', '')) * item.quantity), 0).toFixed(2);
+  };
+
+  const handleCheckout = async () => {
+    if (!customerInfo.name || !customerInfo.email) {
+      alert('Please fill in your name and email address.');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: cartItems,
+          customerInfo: customerInfo
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Checkout failed');
+      }
+
+      await response.json();
+      
+      // Clear cart and close
+      setCartItems([]);
+      setShowCheckout(false);
+      setIsOpen(false);
+      
+      // Reset customer info
+      setCustomerInfo({
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        requestedDate: ''
+      });
+      
+      alert('Order placed successfully! You will receive a confirmation email shortly.');
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('There was an error processing your order. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   // Make addToCart function available globally
@@ -128,7 +185,7 @@ export default function Cart() {
                       <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
                         {item.images && item.images.length > 0 ? (
                           <img
-                            src={item.images[0].url_standard}
+                            src={item.images[0]?.url_standard}
                             alt={item.name}
                             className="w-full h-full object-cover rounded-lg"
                           />
@@ -175,14 +232,94 @@ export default function Cart() {
             {/* Footer */}
             {cartItems.length > 0 && (
               <div className="border-t p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-semibold">Total:</span>
-                  <span className="text-2xl font-bold text-green-600">${getTotalPrice()}</span>
-                </div>
-                
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                  Checkout
-                </button>
+                {!showCheckout ? (
+                  <>
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-lg font-semibold">Total:</span>
+                      <span className="text-2xl font-bold text-green-600">${getTotalPrice()}</span>
+                    </div>
+                    
+                    <button 
+                      onClick={() => setShowCheckout(true)}
+                      className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                    >
+                      Proceed to Checkout
+                    </button>
+                  </>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-lg font-semibold">Total:</span>
+                      <span className="text-2xl font-bold text-green-600">${getTotalPrice()}</span>
+                    </div>
+                    
+                    {/* Customer Information Form */}
+                    <div className="space-y-3">
+                      <h3 className="font-semibold text-gray-900">Contact Information</h3>
+                      
+                      <input
+                        type="text"
+                        placeholder="Full Name *"
+                        value={customerInfo.name}
+                        onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                      
+                      <input
+                        type="email"
+                        placeholder="Email Address *"
+                        value={customerInfo.email}
+                        onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                      
+                      <input
+                        type="tel"
+                        placeholder="Phone Number"
+                        value={customerInfo.phone}
+                        onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      
+                      <textarea
+                        placeholder="Shipping Address"
+                        value={customerInfo.address}
+                        onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        rows={3}
+                      />
+                      
+                      <input
+                        type="date"
+                        placeholder="Preferred Service Date"
+                        value={customerInfo.requestedDate}
+                        onChange={(e) => setCustomerInfo({...customerInfo, requestedDate: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      
+                      <p className="text-xs text-gray-500">* Required fields</p>
+                    </div>
+                    
+                    <div className="flex space-x-3">
+                      <button 
+                        onClick={() => setShowCheckout(false)}
+                        className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                      >
+                        Back to Cart
+                      </button>
+                      
+                      <button 
+                        onClick={handleCheckout}
+                        disabled={isProcessing}
+                        className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isProcessing ? 'Processing...' : 'Place Order'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

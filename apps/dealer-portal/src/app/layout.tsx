@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from 'next/font/google';
+import { ErrorBoundary } from "@4420courts/shared";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,9 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${orbitron.variable} antialiased`}>
-        <div className="min-h-screen bg-gray-50">
-          {children}
-        </div>
+        <ErrorBoundary>
+          <div className="min-h-screen bg-gray-50">
+            {children}
+          </div>
+        </ErrorBoundary>
       </body>
     </html>
   );

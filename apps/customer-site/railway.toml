@@ -1,0 +1,21 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+
+[environments.production]
+[environments.production.variables]
+NODE_ENV = "production"
+SKIP_ENV_VALIDATION = "true"
+PORT = "3000"
+
+[environments.production.deploy]
+startCommand = "npm run build && npm start"
+
+[build.environment]
+NODE_ENV = "production"
+SKIP_ENV_VALIDATION = "true"

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
 import "./globals.css";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import { Footer, ErrorBoundary } from "@4420courts/shared";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({
@@ -35,11 +35,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfairDisplay.variable} ${orbitron.variable} font-sans antialiased`}
       >
-        <AuthProvider>
-          <Navigation />
-          <main>{children}</main>
-          <Footer />
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <Navigation />
+            <main>{children}</main>
+            <Footer />
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

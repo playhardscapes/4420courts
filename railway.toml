@@ -1,6 +1,8 @@
-[build]
-builder = "NIXPACKS"
+# Monorepo configuration - individual apps have their own railway.toml files
+# This file serves as documentation for the monorepo structure
 
-[deploy]
-startCommand = "cd apps/customer-site && npm start"
-healthcheckPath = "/"
+# Customer Site: Deploy from /apps/customer-site/
+# Dealer Portal: Deploy from /apps/dealer-portal/
+
+# Each Railway service should be configured to use the appropriate subdirectory
+# as the root directory for deployment

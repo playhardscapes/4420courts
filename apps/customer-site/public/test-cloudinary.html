@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudinary Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-image { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        img { max-width: 300px; height: auto; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Cloudinary Integration Test</h1>
+    
+    <div class="test-image">
+        <h3>Test 1: Court Kit Image</h3>
+        <p>Public ID: sample-court-kit-v1</p>
+        <img src="https://res.cloudinary.com/dqgy5mfvd/image/upload/w_600,h_400,c_fill,q_auto,f_auto/sample-court-kit-v1" 
+             alt="Court Kit" 
+             onerror="this.src='https://res.cloudinary.com/demo/image/upload/w_600,h_400,c_fill,q_auto,f_auto/sample.jpg'; this.alt='Fallback demo image';">
+    </div>
+    
+    <div class="test-image">
+        <h3>Test 2: Branded Shirt Image</h3>
+        <p>Public ID: 4420-branded-shirt-v1</p>
+        <img src="https://res.cloudinary.com/dqgy5mfvd/image/upload/w_600,h_400,c_fill,q_auto,f_auto/4420-branded-shirt-v1" 
+             alt="Branded Shirt"
+             onerror="this.src='https://res.cloudinary.com/demo/image/upload/w_600,h_400,c_fill,q_auto,f_auto/sample.jpg'; this.alt='Fallback demo image';">
+    </div>
+
+    <div class="test-image">
+        <h3>Test 3: Demo Image (Known to work)</h3>
+        <p>Using Cloudinary demo account sample</p>
+        <img src="https://res.cloudinary.com/demo/image/upload/w_600,h_400,c_fill,q_auto,f_auto/sample.jpg" 
+             alt="Demo sample">
+    </div>
+
+    <script>
+        // Log the URLs for verification
+        console.log('Testing Cloudinary URLs:');
+        console.log('Court Kit:', 'https://res.cloudinary.com/dqgy5mfvd/image/upload/w_600,h_400,c_fill,q_auto,f_auto/sample-court-kit-v1');
+        console.log('Shirt:', 'https://res.cloudinary.com/dqgy5mfvd/image/upload/w_600,h_400,c_fill,q_auto,f_auto/4420-branded-shirt-v1');
+    </script>
+</body>
+</html>

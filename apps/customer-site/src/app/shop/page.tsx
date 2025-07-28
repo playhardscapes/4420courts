@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ShoppingCartIcon, AcademicCapIcon, WrenchScrewdriverIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
+import { getResponsiveImageUrls, isCloudinaryAsset } from '@/lib/cloudinary';
 
 const productCategories = [
   { 
@@ -37,6 +38,7 @@ interface Product {
   price: string;
   images?: Array<{ url_standard: string }>;
   inventory_level?: number;
+  cloudinaryId?: string | null;
 }
 
 export default function ShopPage() {
@@ -102,37 +104,55 @@ export default function ShopPage() {
 
   const fetchProducts = async () => {
     try {
-      // Temporary static products until we build the full system
-      const staticProducts = [
-        {
-          id: '1',
-          name: 'Complete Court Resurfacing Kit',
-          description: '20x 5-gallon buckets (4 gallons material each) - 80 gallons total covers one court',
-          price: '$1,395.00',
-          images: [{ url_standard: '/4420courtslogowide.jpg' }],
-          inventory_level: 25
-        },
-        {
-          id: '2', 
-          name: 'Professional Consultation - 1 Hour',
-          description: 'Expert guidance for your court resurfacing project',
-          price: '$150.00',
-          images: [{ url_standard: '/4420courtslogowide.jpg' }],
-          inventory_level: 999
-        },
-        {
-          id: '3',
-          name: 'Emergency Support Package',
-          description: 'Same-day troubleshooting and problem resolution',
-          price: '$200.00', 
-          images: [{ url_standard: '/4420courtslogowide.jpg' }],
-          inventory_level: 999
-        }
-      ];
+      setLoading(true);
+      setError(null);
       
-      setProducts(staticProducts);
-    } catch {
-      setError('Failed to load products');
+      // Fetch products from dealer portal API
+      const response = await fetch('http://localhost:3001/api/inventory?inventoryType=RETAIL_INVENTORY');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      
+      const data = await response.json();
+      
+      // The API returns { products: [...], stats: {...} }
+      const products = data.products || [];
+      
+      // Transform dealer portal inventory into customer site product format
+      const transformedProducts = products.map((item: any) => {
+        // Extract image from dealer portal item
+        let imageUrl = '/4420courtslogowide.jpg'; // Default fallback
+        
+        if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+          // If images is an array of URLs or public IDs
+          imageUrl = item.images[0];
+        } else if (item.images && typeof item.images === 'object' && item.images.main) {
+          // If images is an object with a main property
+          imageUrl = item.images.main;
+        } else if (item.imageUrl) {
+          // If there's a direct imageUrl property
+          imageUrl = item.imageUrl;
+        }
+
+        return {
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          price: `$${item.retailPrice.toFixed(2)}`,
+          images: [{ url_standard: imageUrl }],
+          inventory_level: item.stockQuantity || 0,
+          category: item.category,
+          weight: item.weight,
+          dimensions: item.dimensions,
+          cloudinaryId: isCloudinaryAsset(imageUrl) ? imageUrl : null
+        };
+      });
+
+      setProducts(transformedProducts);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError('Failed to load products. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -173,7 +193,7 @@ export default function ShopPage() {
           <h1 className="text-3xl font-bold text-red-600 mb-4">Error Loading Products</h1>
           <p className="text-gray-600 mb-6">{error}</p>
           <p className="text-sm text-gray-500">
-            Make sure you&apos;ve added your BigCommerce API credentials to .env.local
+            Make sure the dealer portal is running on localhost:3001
           </p>
           <button 
             onClick={fetchProducts}
@@ -238,7 +258,7 @@ export default function ShopPage() {
             </h3>
             <p className="text-gray-600">
               {selectedCategory === 'all' 
-                ? 'Add products to your BigCommerce store to see them here.'
+                ? 'Products will appear here once the dealer portal is connected.'
                 : 'Try selecting a different category or check back later.'
               }
             </p>
@@ -268,11 +288,34 @@ export default function ShopPage() {
                     <div className="p-4">
                       <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-xl bg-gray-100">
                         {product.images && product.images.length > 0 ? (
-                          <img
-                            src={product.images[0].url_standard}
-                            alt={product.name}
-                            className="h-48 w-full object-cover object-center"
-                          />
+                          (() => {
+                            const imageUrl = product.images[0]?.url_standard;
+                            
+                            // Use Cloudinary optimization if it's a Cloudinary asset
+                            if (product.cloudinaryId) {
+                              const responsiveUrls = getResponsiveImageUrls(product.cloudinaryId);
+                              return (
+                                <img
+                                  src={responsiveUrls.src}
+                                  srcSet={responsiveUrls.srcSet}
+                                  sizes={responsiveUrls.sizes}
+                                  alt={product.name}
+                                  className="h-48 w-full object-cover object-center"
+                                  loading="lazy"
+                                />
+                              );
+                            } else {
+                              // Fallback to original URL
+                              return (
+                                <img
+                                  src={imageUrl}
+                                  alt={product.name}
+                                  className="h-48 w-full object-cover object-center"
+                                  loading="lazy"
+                                />
+                              );
+                            }
+                          })()
                         ) : (
                           <div className="h-48 w-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                             <ShoppingCartIcon className="w-12 h-12 text-gray-400" />

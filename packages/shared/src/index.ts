@@ -4,5 +4,5 @@ export * from './types';
 // Export all utilities
 export * from './utils';
 
-// Export components (when we add them)
-// export * from './components';
+// Export components
+export * from './components';
