@@ -151,8 +151,208 @@ git push origin main
 - **Customer profile**: "Two guys & a pickup" contractors and overwhelmed homeowners
 - **No bulk pricing** - everyone pays retail for premium service
 
+## 🏢 **DEALER PORTAL COMPLETE SYSTEM DOCUMENTATION**
+
+### **❗ CRITICAL: Complete Dealer Portal with Accounting EXISTS**
+
+**STATUS**: The comprehensive dealer portal with full accounting functionality was accidentally deleted/overwritten during a Claude session on January 28, 2025. The database schema shows it was a complete enterprise system.
+
+### **🗄️ DATABASE SCHEMA (COMPLETE SYSTEM)**
+
+**Location**: `/home/info4420/github/4420courts/prisma/schema.prisma`
+
+#### **DEALER MANAGEMENT SYSTEM**
+```typescript
+model Dealer {
+  id              String @id @default(cuid())
+  userId          String @unique
+  companyName     String
+  dealerCode      String @unique
+  territory       String?
+  commissionRate  Decimal @default(0.10)
+  serviceLevel    DealerServiceLevel
+  status          DealerStatus @default(PENDING)
+  businessAddress Json
+  orders          Order[]
+  commissions     Commission[]
+  territories     Territory[]
+}
+
+enum DealerServiceLevel {
+  LEVEL_1    // Free DIY Resources ($0)
+  LEVEL_2    // Monthly Membership ($49.99/month)
+  LEVEL_3    // Coating & Lining Specialist ($10k-15k)
+  LEVEL_4    // Project Management + Finish ($15k-25k)
+  LEVEL_5    // Full Project Management ($30k-45k)
+  LEVEL_5_5  // Premium Personalized (Contact for Pricing)
+}
+```
+
+#### **COMPLETE ACCOUNTING SYSTEM**
+```typescript
+model Account {
+  id            String @id @default(cuid())
+  code          String @unique // Account code (e.g., "1001")
+  name          String
+  type          AccountType
+  parentId      String?
+  parent        Account? @relation("AccountHierarchy")
+  children      Account[] @relation("AccountHierarchy")
+  balance       Decimal @default(0)
+  debitEntries  JournalEntry[] @relation("DebitAccount")
+  creditEntries JournalEntry[] @relation("CreditAccount")
+}
+
+model JournalEntry {
+  id              String @id @default(cuid())
+  entryNumber     String @unique
+  debitAccountId  String
+  debitAccount    Account @relation("DebitAccount")
+  creditAccountId String
+  creditAccount   Account @relation("CreditAccount")
+  amount          Decimal
+  description     String
+  reference       String? // Order ID, Invoice ID, etc.
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+```
+
+#### **COMPLETE BUSINESS SYSTEM**
+- **Customer Management**: Full customer profiles with billing/shipping
+- **Product Catalog**: Complete product system with dealer/retail/wholesale pricing
+- **Order Management**: Full order processing with dealer assignment
+- **Invoice System**: Professional invoicing with line items
+- **Payment Processing**: Multiple payment methods (Stripe, PayPal, etc.)
+- **Commission Tracking**: Automatic commission calculation and payment
+- **Territory Management**: Geographic boundaries for dealers
+- **Inventory Management**: Stock tracking with moves (SALE, PURCHASE, ADJUSTMENT, etc.)
+- **Support System**: Customer service ticketing
+- **Reporting System**: Custom report generation (SALES, FINANCIAL, DEALER_PERFORMANCE)
+
+### **📊 CHART OF ACCOUNTS (EXISTS)**
+
+**Location**: `/home/info4420/github/4420courts/filesfortransfer/ChartOfAccounts.csv`
+
+**Sample Accounts (80+ total)**:
+- **1000**: Cash (ASSET)
+- **1100**: Accounts Receivable (ASSET)
+- **1200**: Inventory (ASSET)
+- **1500**: Equipment (ASSET)
+- **2000**: Accounts Payable (LIABILITY)
+- **2100**: Sales Tax Payable (LIABILITY)
+- **3000**: Owners Equity (EQUITY)
+- **4000**: Product Sales (REVENUE)
+- **4100**: Service Revenue (REVENUE)
+- **5000**: Cost of Goods Sold (EXPENSE)
+- **6200**: Commission Expense (EXPENSE)
+
+### **💼 FINANCIAL DOCUMENTS (EXISTS)**
+**Location**: `/home/info4420/github/4420courts/filesfortransfer/`
+- Balance Sheet (PDF + Excel)
+- Income Statement/P&L (PDF + Excel)
+- Sales Invoices CSV
+- Contacts database
+
+### **🔧 MISSING COMPONENTS (Need to Rebuild)**
+
+#### **DEALER PORTAL FRONTEND** (`/apps/dealer-portal/src/app/`)
+**Current State**: Only basic homepage + calendar page
+**Missing**:
+1. **Accounting Interface**:
+   - Chart of Accounts management (`/accounting/accounts`)
+   - Journal Entry forms (`/accounting/journal`)
+   - Financial reports (`/accounting/reports`)
+   - Trial Balance (`/accounting/trial-balance`)
+
+2. **Dealer Management**:
+   - Dealer dashboard (`/dashboard`)
+   - Commission tracking (`/commissions`)
+   - Territory management (`/territory`)
+   - Performance analytics (`/analytics`)
+
+3. **Business Operations**:
+   - Order management (`/orders`)
+   - Customer management (`/customers`)
+   - Inventory overview (`/inventory`)
+   - Settings (`/settings`)
+
+### **🚀 REBUILD INSTRUCTIONS**
+
+#### **Step 1: Generate Database Client**
+```bash
+cd /home/info4420/github/4420courts
+npx prisma generate
+npx prisma db push
+npx prisma db seed
+```
+
+#### **Step 2: Create Missing Pages**
+```typescript
+// Create these pages in /apps/dealer-portal/src/app/
+/accounting/
+  /accounts/page.tsx          // Chart of Accounts
+  /journal/page.tsx           // Journal Entries
+  /reports/page.tsx           // Financial Reports
+/dashboard/page.tsx           // Main dealer dashboard
+/commissions/page.tsx         // Commission tracking
+/orders/page.tsx              // Order management
+/customers/page.tsx           // Customer management
+/settings/page.tsx            // Dealer settings
+```
+
+#### **Step 3: Import Chart of Accounts**
+```typescript
+// Use the ChartOfAccounts.csv to populate accounts table
+// Parse CSV and create Account records with proper hierarchy
+```
+
+#### **Step 4: Build Components**
+- Financial report generators (P&L, Balance Sheet)
+- Commission calculation displays
+- Order assignment workflows
+- Customer relationship management
+
+### **🛡️ PROTECTION MEASURES**
+
+#### **Backup Branches**
+- `dealer-portal-complete-backup` - Created January 28, 2025
+- Always create feature branches before major changes
+
+#### **Commit Strategy**
+```bash
+# Commit frequently with descriptive messages
+git add .
+git commit -m "Add accounting: Chart of Accounts interface
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+
+#### **Documentation Requirements**
+- Update this CLAUDE.md after each major component
+- Document any schema changes
+- Keep screenshots of working interfaces
+
+### **🎯 REBUILD PRIORITY ORDER**
+1. **Database Client Setup** - Get Prisma working
+2. **Chart of Accounts** - Import and display existing data
+3. **Basic Dashboard** - Dealer overview page
+4. **Journal Entries** - Accounting transaction forms
+5. **Financial Reports** - P&L and Balance Sheet generation
+6. **Commission System** - Dealer payment tracking
+7. **Order Integration** - Connect accounting to business operations
+
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: January 28, 2025
 **Repository**: https://github.com/playhardscapes/4420courts.git
 **Deployment**: Railway (monitors main branch)
+**Critical**: Complete dealer portal with accounting system needs rebuilding
