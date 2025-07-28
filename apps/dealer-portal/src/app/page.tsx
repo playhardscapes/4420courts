@@ -1,6 +1,20 @@
-import { CalendarIcon, UserGroupIcon, ChartBarIcon, CogIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, UserGroupIcon, ChartBarIcon, CogIcon, BookOpenIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 const features = [
+  {
+    name: 'Accounting System',
+    description: 'Complete double-entry bookkeeping with Chart of Accounts, Journal Entries, and Financial Reports.',
+    icon: BookOpenIcon,
+    href: '/accounting',
+    color: 'bg-emerald-500',
+  },
+  {
+    name: 'Commission Tracking',
+    description: 'Track dealer commissions, territory performance, and payment schedules.',
+    icon: CurrencyDollarIcon,
+    href: '/commissions',
+    color: 'bg-green-500',
+  },
   {
     name: 'Calendar & Scheduling',
     description: 'Manage consultations, site visits, and project timelines in one place.',
@@ -13,21 +27,21 @@ const features = [
     description: 'Track leads, manage customer relationships, and monitor project progress.',
     icon: UserGroupIcon,
     href: '/customers',
-    color: 'bg-green-500',
+    color: 'bg-purple-500',
   },
   {
     name: 'Analytics & Reports',
     description: 'View performance metrics, revenue tracking, and territory insights.',
     icon: ChartBarIcon,
     href: '/analytics',
-    color: 'bg-purple-500',
+    color: 'bg-orange-500',
   },
   {
     name: 'Business Settings',
     description: 'Configure your territory, pricing, and operational preferences.',
     icon: CogIcon,
     href: '/settings',
-    color: 'bg-orange-500',
+    color: 'bg-gray-500',
   },
 ];
 
