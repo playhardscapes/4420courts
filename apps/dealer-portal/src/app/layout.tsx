@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from 'next/font/google';
+import { SidebarNavigation } from '../components/layout/SidebarNavigation';
 import "./globals.css";
 
 const inter = Inter({
@@ -14,7 +15,7 @@ const orbitron = Orbitron({
 
 export const metadata: Metadata = {
   title: "4420 Courts Dealer Portal",
-  description: "Franchise management and operations dashboard for 4420 Courts dealers",
+  description: "Complete dealer portal with accounting, commission tracking, and business management",
 };
 
 export default function RootLayout({
@@ -26,7 +27,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${orbitron.variable} antialiased`}>
         <div className="min-h-screen bg-gray-50">
-          {children}
+          <SidebarNavigation />
+          <main className="lg:pl-72">
+            {children}
+          </main>
         </div>
       </body>
     </html>

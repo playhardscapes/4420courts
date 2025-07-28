@@ -49,18 +49,18 @@ export default function DealerPortalHome() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white shadow">
+      <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <h1 className="text-3xl font-bold text-gray-900">
-                4420 Courts Dealer Portal
+              <h1 className="text-3xl font-bold text-gray-900 font-orbitron">
+                Dealer Dashboard
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">Welcome, Dealer</span>
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-semibold">D</span>
+              <span className="text-sm font-medium text-gray-600">Welcome back!</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-green-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-bold">D</span>
               </div>
             </div>
           </div>
