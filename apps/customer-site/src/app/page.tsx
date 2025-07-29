@@ -1,4 +1,5 @@
 import Link from "next/link";
+import WhereIAmTodayWidget from "@/components/WhereIAmTodayWidget";
 
 export default function Home() {
   return (
@@ -83,6 +84,21 @@ export default function Home() {
               <p className="text-gray-600">We apply professional-grade surfaces, paint precise lines, and install all the accessories.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Where I Am Today Widget Section */}
+      <section className="py-16 px-4 bg-gray-100">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold font-heading text-gray-900 mb-4">
+              Transparency in Action
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              See exactly where I am and what I'm working on today. No hiding, no excuses - just honest, quality work.
+            </p>
+          </div>
+          <WhereIAmTodayWidget />
         </div>
       </section>
 
