@@ -8,7 +8,8 @@ import {
   ArrowDownTrayIcon,
   MagnifyingGlassIcon,
   FunnelIcon,
-  SparklesIcon,\n  TrashIcon
+  SparklesIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 
 interface JournalEntry {

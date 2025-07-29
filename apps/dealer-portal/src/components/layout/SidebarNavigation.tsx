@@ -27,7 +27,7 @@ import {
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
-  { name: 'Scheduling', href: '/scheduling', icon: CalendarIcon },
+  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
   { name: 'Customers', href: '/customers', icon: UserGroupIcon },
   { name: 'Quotes', href: '/quotes', icon: DocumentTextIcon },
   { name: 'Contracts', href: '/contracts', icon: DocumentDuplicateIcon },
