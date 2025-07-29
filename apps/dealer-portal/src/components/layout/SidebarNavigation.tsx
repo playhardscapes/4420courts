@@ -18,26 +18,32 @@ import {
   ChevronRightIcon,
   CubeIcon,
   ShoppingCartIcon,
-  BuildingOfficeIcon
+  BuildingOfficeIcon,
+  DocumentDuplicateIcon,
+  ClipboardDocumentListIcon,
+  WrenchScrewdriverIcon,
+  BanknotesIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
+  { name: 'Scheduling', href: '/scheduling', icon: CalendarIcon },
+  { name: 'Customers', href: '/customers', icon: UserGroupIcon },
+  { name: 'Quotes', href: '/quotes', icon: DocumentTextIcon },
+  { name: 'Contracts', href: '/contracts', icon: DocumentDuplicateIcon },
+  { name: 'Projects', href: '/projects', icon: WrenchScrewdriverIcon },
+  { name: 'Invoices', href: '/invoices', icon: BanknotesIcon },
   { 
     name: 'Accounting', 
     href: '/accounting', 
     icon: BookOpenIcon,
     children: [
       { name: 'Chart of Accounts', href: '/accounting/accounts' },
-      { name: 'Financial Reports', href: '/accounting/reports' }
+      { name: 'Journal Entries', href: '/accounting/journal' },
+      { name: 'Financial Reports', href: '/accounting/reports' },
+      { name: 'Import Data', href: '/accounting/import' }
     ]
   },
-  { name: 'Commissions', href: '/commissions', icon: CurrencyDollarIcon },
-  { name: 'Orders', href: '/orders', icon: ShoppingCartIcon },
-  { name: 'Inventory', href: '/inventory', icon: CubeIcon },
-  { name: 'Assets', href: '/assets', icon: BuildingOfficeIcon },
-  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
-  { name: 'Customers', href: '/customers', icon: UserGroupIcon },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ];
