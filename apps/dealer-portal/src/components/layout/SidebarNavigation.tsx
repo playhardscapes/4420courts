@@ -12,13 +12,30 @@ import {
   ChartBarIcon,
   CogIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  DocumentTextIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  CubeIcon,
+  ShoppingCartIcon,
+  BuildingOfficeIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
-  { name: 'Accounting', href: '/accounting', icon: BookOpenIcon },
+  { 
+    name: 'Accounting', 
+    href: '/accounting', 
+    icon: BookOpenIcon,
+    children: [
+      { name: 'Chart of Accounts', href: '/accounting/accounts' },
+      { name: 'Financial Reports', href: '/accounting/reports' }
+    ]
+  },
   { name: 'Commissions', href: '/commissions', icon: CurrencyDollarIcon },
+  { name: 'Orders', href: '/orders', icon: ShoppingCartIcon },
+  { name: 'Inventory', href: '/inventory', icon: CubeIcon },
+  { name: 'Assets', href: '/assets', icon: BuildingOfficeIcon },
   { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
   { name: 'Customers', href: '/customers', icon: UserGroupIcon },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
@@ -27,7 +44,16 @@ const navigation = [
 
 export function SidebarNavigation() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<string[]>(['Accounting']);
   const pathname = usePathname();
+
+  const toggleExpanded = (itemName: string) => {
+    setExpandedItems(prev => 
+      prev.includes(itemName) 
+        ? prev.filter(name => name !== itemName)
+        : [...prev, itemName]
+    );
+  };
 
   return (
     <>
@@ -37,7 +63,7 @@ export function SidebarNavigation() {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
           <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
             <div className="flex h-16 shrink-0 items-center justify-between px-6 shadow-sm">
-              <img className="h-8 w-auto" src="/4420courtslogowide.jpg" alt="4420 Courts" />
+              <img className="h-6 w-auto max-w-32" src="/4420courtslogowide.jpg" alt="4420 Courts" />
               <button
                 type="button"
                 className="text-gray-700 hover:text-gray-900"
@@ -49,21 +75,69 @@ export function SidebarNavigation() {
             <nav className="flex flex-1 flex-col overflow-y-auto px-6 py-6">
               <ul className="flex flex-1 flex-col gap-y-2">
                 {navigation.map((item) => {
+                  const hasChildren = 'children' in item && item.children;
                   const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                  const isExpanded = expandedItems.includes(item.name);
+                  
                   return (
                     <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className={`group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ${
-                          isActive
-                            ? 'bg-blue-50 text-blue-600'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
-                        }`}
-                        onClick={() => setSidebarOpen(false)}
-                      >
-                        <item.icon className="h-6 w-6 shrink-0" />
-                        {item.name}
-                      </Link>
+                      {hasChildren ? (
+                        <div>
+                          <button
+                            onClick={() => toggleExpanded(item.name)}
+                            className={`group flex w-full justify-between items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ${
+                              isActive
+                                ? 'bg-blue-50 text-blue-600'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                            }`}
+                          >
+                            <div className="flex items-center gap-x-3">
+                              <item.icon className="h-6 w-6 shrink-0" />
+                              {item.name}
+                            </div>
+                            {isExpanded ? (
+                              <ChevronDownIcon className="h-4 w-4" />
+                            ) : (
+                              <ChevronRightIcon className="h-4 w-4" />
+                            )}
+                          </button>
+                          {isExpanded && (
+                            <ul className="mt-1 ml-6 space-y-1">
+                              {item.children?.map((child) => {
+                                const childIsActive = pathname === child.href;
+                                return (
+                                  <li key={child.name}>
+                                    <Link
+                                      href={child.href}
+                                      className={`block rounded-md px-3 py-2 text-sm ${
+                                        childIsActive
+                                          ? 'bg-blue-50 text-blue-600 font-medium'
+                                          : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
+                                      }`}
+                                      onClick={() => setSidebarOpen(false)}
+                                    >
+                                      {child.name}
+                                    </Link>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          )}
+                        </div>
+                      ) : (
+                        <Link
+                          href={item.href}
+                          className={`group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ${
+                            isActive
+                              ? 'bg-blue-50 text-blue-600'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                          }`}
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          <item.icon className="h-6 w-6 shrink-0" />
+                          {item.name}
+                        </Link>
+                      )}
                     </li>
                   );
                 })}
@@ -77,28 +151,75 @@ export function SidebarNavigation() {
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r border-gray-200 px-6 py-4">
           <div className="flex h-16 shrink-0 items-center">
-            <img className="h-8 w-auto" src="/4420courtslogowide.jpg" alt="4420 Courts" />
+            <img className="h-6 w-auto max-w-32" src="/4420courtslogowide.jpg" alt="4420 Courts" />
             <div className="ml-3">
-              <h1 className="text-lg font-bold text-gray-900">Dealer Portal</h1>
+              <h1 className="text-sm font-bold text-gray-900">Dealer Portal</h1>
             </div>
           </div>
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-2">
               {navigation.map((item) => {
+                const hasChildren = 'children' in item && item.children;
                 const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                const isExpanded = expandedItems.includes(item.name);
+                
                 return (
                   <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={`group flex gap-x-3 rounded-md p-3 text-sm font-semibold leading-6 transition-colors ${
-                        isActive
-                          ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
-                          : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
-                      }`}
-                    >
-                      <item.icon className="h-6 w-6 shrink-0" />
-                      {item.name}
-                    </Link>
+                    {hasChildren ? (
+                      <div>
+                        <button
+                          onClick={() => toggleExpanded(item.name)}
+                          className={`group flex w-full justify-between items-center gap-x-3 rounded-md p-3 text-sm font-semibold leading-6 transition-colors ${
+                            isActive
+                              ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                          }`}
+                        >
+                          <div className="flex items-center gap-x-3">
+                            <item.icon className="h-6 w-6 shrink-0" />
+                            {item.name}
+                          </div>
+                          {isExpanded ? (
+                            <ChevronDownIcon className="h-4 w-4" />
+                          ) : (
+                            <ChevronRightIcon className="h-4 w-4" />
+                          )}
+                        </button>
+                        {isExpanded && (
+                          <ul className="mt-1 ml-9 space-y-1">
+                            {item.children?.map((child) => {
+                              const childIsActive = pathname === child.href;
+                              return (
+                                <li key={child.name}>
+                                  <Link
+                                    href={child.href}
+                                    className={`block rounded-md px-3 py-2 text-sm transition-colors ${
+                                      childIsActive
+                                        ? 'bg-blue-50 text-blue-600 font-medium border-r-2 border-blue-600'
+                                        : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
+                                    }`}
+                                  >
+                                    {child.name}
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        )}
+                      </div>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        className={`group flex gap-x-3 rounded-md p-3 text-sm font-semibold leading-6 transition-colors ${
+                          isActive
+                            ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                        }`}
+                      >
+                        <item.icon className="h-6 w-6 shrink-0" />
+                        {item.name}
+                      </Link>
+                    )}
                   </li>
                 );
               })}
@@ -131,7 +252,7 @@ export function SidebarNavigation() {
         </button>
         
         <div className="flex flex-1 items-center justify-between">
-          <img className="h-8 w-auto" src="/4420courtslogowide.jpg" alt="4420 Courts" />
+          <img className="h-6 w-auto max-w-32" src="/4420courtslogowide.jpg" alt="4420 Courts" />
           <div className="text-sm font-medium text-gray-900">Dealer Portal</div>
         </div>
       </div>

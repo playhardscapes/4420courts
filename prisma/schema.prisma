@@ -647,3 +647,75 @@ enum ReportType {
   CUSTOMER
   CUSTOM
 }
+
+// ========================================
+// ASSET MANAGEMENT
+// ========================================
+
+model Asset {
+  id                    String @id @default(cuid())
+  name                  String
+  description           String?
+  category              AssetCategory
+  serialNumber          String @unique
+  model                 String?
+  manufacturer          String?
+  
+  // Financial information
+  purchaseDate          DateTime
+  purchasePrice         Decimal
+  currentValue          Decimal
+  
+  // Condition and status
+  condition             AssetCondition
+  status                AssetStatus @default(ACTIVE)
+  
+  // Location and assignment
+  location              String?
+  assignedTo            String?
+  
+  // Maintenance
+  warrantyExpiry        DateTime?
+  maintenanceSchedule   String?
+  lastMaintenanceDate   DateTime?
+  
+  // Insurance
+  insurancePolicyNumber String?
+  
+  // Images stored in Cloudinary
+  images                Json? // Array of image objects with url, publicId, caption, isPrimary
+  
+  // Additional information
+  notes                 String?
+  metadata              Json? // For custom fields
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("assets")
+}
+
+enum AssetCategory {
+  TOOLS
+  VEHICLES
+  EQUIPMENT
+  TECHNOLOGY
+  FURNITURE
+  OTHER
+}
+
+enum AssetCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  DAMAGED
+}
+
+enum AssetStatus {
+  ACTIVE
+  INACTIVE
+  SOLD
+  DISPOSED
+  STOLEN
+}
