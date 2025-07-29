@@ -63,7 +63,12 @@ interface AssetStats {
   needsMaintenance: number;
 }
 
-export function AssetManagement() {
+interface AssetManagementProps {
+  showAddModal: boolean;
+  setShowAddModal: (show: boolean) => void;
+}
+
+export function AssetManagement({ showAddModal, setShowAddModal }: AssetManagementProps) {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [stats, setStats] = useState<AssetStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,8 +76,11 @@ export function AssetManagement() {
   const [categoryFilter, setCategoryFilter] = useState<AssetCategory | 'ALL'>('ALL');
   const [statusFilter, setStatusFilter] = useState<AssetStatus | 'ALL'>('ALL');
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -81,6 +89,32 @@ export function AssetManagement() {
 
   const fetchAssetData = async () => {
     try {
+      const response = await fetch('/api/assets');
+      if (response.ok) {
+        const data = await response.json();
+        setAssets(data.assets || []);
+        
+        // Calculate stats from real data
+        const realStats: AssetStats = {
+          totalAssets: data.assets?.length || 0,
+          totalValue: data.assets?.reduce((sum: number, asset: Asset) => sum + asset.currentValue, 0) || 0,
+          toolsCount: data.assets?.filter((a: Asset) => a.category === 'TOOLS').length || 0,
+          vehiclesCount: data.assets?.filter((a: Asset) => a.category === 'VEHICLES').length || 0,
+          equipmentCount: data.assets?.filter((a: Asset) => a.category === 'EQUIPMENT').length || 0,
+          needsMaintenance: data.assets?.filter((a: Asset) => {
+            if (!a.lastMaintenanceDate) return true;
+            const lastMaintenance = new Date(a.lastMaintenanceDate);
+            const now = new Date();
+            const daysSince = (now.getTime() - lastMaintenance.getTime()) / (1000 * 3600 * 24);
+            return daysSince > 180; // 6 months
+          }).length || 0
+        };
+        setStats(realStats);
+        return;
+      }
+      
+      // Fallback to sample data if API fails
+      console.log('API failed, using sample data for demo');
       // Sample asset data for insurance documentation
       const sampleAssets: Asset[] = [
         {
@@ -287,6 +321,84 @@ export function AssetManagement() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCreateAsset = async (assetData: Partial<Asset>) => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/assets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(assetData)
+      });
+      
+      if (response.ok) {
+        await fetchAssetData(); // Refresh the list
+        setShowAddModal(false);
+        alert('Asset created successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Failed to create asset: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error creating asset:', error);
+      alert('Failed to create asset. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUpdateAsset = async (assetData: Partial<Asset>) => {
+    if (!editingAsset) return;
+    
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/assets/${editingAsset.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(assetData)
+      });
+      
+      if (response.ok) {
+        await fetchAssetData(); // Refresh the list
+        setShowEditModal(false);
+        setEditingAsset(null);
+        alert('Asset updated successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Failed to update asset: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error updating asset:', error);
+      alert('Failed to update asset. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteAsset = async (assetId: string) => {
+    try {
+      const response = await fetch(`/api/assets/${assetId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        await fetchAssetData(); // Refresh the list
+        setShowDeleteConfirm(null);
+        alert('Asset deleted successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Failed to delete asset: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting asset:', error);
+      alert('Failed to delete asset. Please try again.');
+    }
+  };
+
+  const handleEditClick = (asset: Asset) => {
+    setEditingAsset(asset);
+    setShowEditModal(true);
   };
 
   const handleImageUpload = async (files: FileList | null) => {
@@ -636,6 +748,7 @@ export function AssetManagement() {
                           <EyeIcon className="w-4 h-4" />
                         </button>
                         <button
+                          onClick={() => handleEditClick(asset)}
                           className="text-gray-600 hover:text-gray-900"
                           title="Edit Asset"
                         >
@@ -647,6 +760,13 @@ export function AssetManagement() {
                           title="Add Photos"
                         >
                           <CameraIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setShowDeleteConfirm(asset.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Delete Asset"
+                        >
+                          <TrashIcon className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -817,6 +937,409 @@ export function AssetManagement() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setShowDeleteConfirm(null)}>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <TrashIcon className="h-6 w-6 text-red-600" />
+                  </div>
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">Delete Asset</h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        Are you sure you want to delete this asset? This action cannot be undone.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  onClick={() => handleDeleteAsset(showDeleteConfirm)}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => setShowDeleteConfirm(null)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Asset Modal */}
+      {showAddModal && (
+        <AssetFormModal
+          title="Add New Asset"
+          onSubmit={handleCreateAsset}
+          onCancel={() => setShowAddModal(false)}
+          isSaving={isSaving}
+        />
+      )}
+
+      {/* Edit Asset Modal */}
+      {showEditModal && editingAsset && (
+        <AssetFormModal
+          title="Edit Asset"
+          asset={editingAsset}
+          onSubmit={handleUpdateAsset}
+          onCancel={() => {
+            setShowEditModal(false);
+            setEditingAsset(null);
+          }}
+          isSaving={isSaving}
+        />
+      )}
+    </div>
+  );
+}
+
+// Asset Form Modal Component
+interface AssetFormModalProps {
+  title: string;
+  asset?: Asset;
+  onSubmit: (data: Partial<Asset>) => void;
+  onCancel: () => void;
+  isSaving: boolean;
+}
+
+function AssetFormModal({ title, asset, onSubmit, onCancel, isSaving }: AssetFormModalProps) {
+  const [formData, setFormData] = useState({
+    name: asset?.name || '',
+    description: asset?.description || '',
+    category: asset?.category || 'TOOLS' as AssetCategory,
+    serialNumber: asset?.serialNumber || '',
+    model: asset?.model || '',
+    manufacturer: asset?.manufacturer || '',
+    purchaseDate: asset?.purchaseDate?.split('T')[0] || '',
+    purchasePrice: asset?.purchasePrice || 0,
+    currentValue: asset?.currentValue || 0,
+    condition: asset?.condition || 'EXCELLENT' as AssetCondition,
+    status: asset?.status || 'ACTIVE' as AssetStatus,
+    location: asset?.location || '',
+    assignedTo: asset?.assignedTo || '',
+    warrantyExpiry: asset?.warrantyExpiry?.split('T')[0] || '',
+    maintenanceSchedule: asset?.maintenanceSchedule || '',
+    lastMaintenanceDate: asset?.lastMaintenanceDate?.split('T')[0] || '',
+    insurancePolicyNumber: asset?.insurancePolicyNumber || '',
+    notes: asset?.notes || ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name.includes('Price') || name.includes('Value') ? parseFloat(value) || 0 : value
+    }));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+        <div className="fixed inset-0 transition-opacity" onClick={onCancel}>
+          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+          <form onSubmit={handleSubmit}>
+            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+                <button type="button" onClick={onCancel} className="text-gray-400 hover:text-gray-600">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900">Basic Information</h4>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Asset Name *</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                      <select
+                        name="category"
+                        value={formData.category}
+                        onChange={handleChange}
+                        required
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="TOOLS">Tools</option>
+                        <option value="VEHICLES">Vehicles</option>
+                        <option value="EQUIPMENT">Equipment</option>
+                        <option value="TECHNOLOGY">Technology</option>
+                        <option value="FURNITURE">Furniture</option>
+                        <option value="OTHER">Other</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Serial Number *</label>
+                      <input
+                        type="text"
+                        name="serialNumber"
+                        value={formData.serialNumber}
+                        onChange={handleChange}
+                        required
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                      <input
+                        type="text"
+                        name="model"
+                        value={formData.model}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Manufacturer</label>
+                      <input
+                        type="text"
+                        name="manufacturer"
+                        value={formData.manufacturer}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Financial & Status Information */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900">Financial & Status</h4>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Date *</label>
+                      <input
+                        type="date"
+                        name="purchaseDate"
+                        value={formData.purchaseDate}
+                        onChange={handleChange}
+                        required
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Price *</label>
+                      <input
+                        type="number"
+                        name="purchasePrice"
+                        value={formData.purchasePrice}
+                        onChange={handleChange}
+                        required
+                        min="0"
+                        step="0.01"
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Current Value *</label>
+                    <input
+                      type="number"
+                      name="currentValue"
+                      value={formData.currentValue}
+                      onChange={handleChange}
+                      required
+                      min="0"
+                      step="0.01"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Condition *</label>
+                      <select
+                        name="condition"
+                        value={formData.condition}
+                        onChange={handleChange}
+                        required
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="EXCELLENT">Excellent</option>
+                        <option value="GOOD">Good</option>
+                        <option value="FAIR">Fair</option>
+                        <option value="POOR">Poor</option>
+                        <option value="DAMAGED">Damaged</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
+                      <select
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        required
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="ACTIVE">Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                        <option value="SOLD">Sold</option>
+                        <option value="DISPOSED">Disposed</option>
+                        <option value="STOLEN">Stolen</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                      <input
+                        type="text"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+                      <input
+                        type="text"
+                        name="assignedTo"
+                        value={formData.assignedTo}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Warranty Expiry</label>
+                      <input
+                        type="date"
+                        name="warrantyExpiry"
+                        value={formData.warrantyExpiry}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Last Maintenance</label>
+                      <input
+                        type="date"
+                        name="lastMaintenanceDate"
+                        value={formData.lastMaintenanceDate}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Maintenance Schedule</label>
+                    <input
+                      type="text"
+                      name="maintenanceSchedule"
+                      value={formData.maintenanceSchedule}
+                      onChange={handleChange}
+                      placeholder="e.g., Every 6 months"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Insurance Policy Number</label>
+                    <input
+                      type="text"
+                      name="insurancePolicyNumber"
+                      value={formData.insurancePolicyNumber}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+              >
+                {isSaving ? 'Saving...' : (asset ? 'Update Asset' : 'Create Asset')}
+              </button>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

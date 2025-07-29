@@ -1,7 +1,9 @@
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { AssetManagement } from './components/AssetManagement';
 
 export default function AssetsPage() {
+  const [showAddModal, setShowAddModal] = useState(false);
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -17,7 +19,10 @@ export default function AssetsPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={() => setShowAddModal(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
                 Add Asset
               </button>
               <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
@@ -31,7 +36,10 @@ export default function AssetsPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Suspense fallback={<div className="text-center py-8">Loading asset data...</div>}>
-          <AssetManagement />
+          <AssetManagement 
+            showAddModal={showAddModal} 
+            setShowAddModal={setShowAddModal}
+          />
         </Suspense>
       </div>
     </div>

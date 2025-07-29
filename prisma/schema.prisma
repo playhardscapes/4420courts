@@ -187,6 +187,8 @@ model Product {
   orderItems     OrderItem[]
   invoiceItems   InvoiceItem[]
   inventoryMoves InventoryMove[]
+  billItems      BillItem[]
+  poItems        POItem[]
   
   status    ProductStatus @default(ACTIVE)
   createdAt DateTime      @default(now())
@@ -581,6 +583,9 @@ model Account {
   debitEntries  JournalEntry[] @relation("DebitAccount")
   creditEntries JournalEntry[] @relation("CreditAccount")
   
+  // Bank transactions
+  bankTransactions BankTransaction[] @relation("AccountTransactions")
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -610,6 +615,9 @@ model JournalEntry {
   
   // Metadata
   metadata Json?
+  
+  // Relations
+  bankTransactions BankTransaction[]
   
   entryDate DateTime @default(now())
   createdAt DateTime @default(now())
@@ -649,6 +657,223 @@ enum ReportType {
 }
 
 // ========================================
+// TRANSACTION MANAGEMENT & AI CATEGORIZATION
+// ========================================
+
+model BankTransaction {
+  id              String @id @default(cuid())
+  externalId      String @unique // Bank's transaction ID
+  date            DateTime
+  description     String
+  amount          Decimal // Negative for debits, positive for credits
+  balance         Decimal? // Account balance after transaction
+  transactionType String // DEBIT, CREDIT, TRANSFER, etc.
+  bankAccount     BankAccountType
+  
+  // AI Categorization Results
+  category        String? // ASSET_PURCHASE, COST_OF_GOODS_SOLD, OPERATING_EXPENSE, etc.
+  subcategory     String? // TOOLS, MATERIALS, VEHICLE_FUEL, etc.
+  confidence      Decimal? // AI confidence score 0-1
+  accountType     String? // ASSET, EXPENSE, LIABILITY
+  aiAnalysis      String? // AI explanation of categorization
+  needsReview     Boolean @default(false)
+  processed       Boolean @default(false)
+  
+  // Linked Records
+  assetId         String? // If transaction created an asset
+  asset           Asset? @relation(fields: [assetId], references: [id])
+  billId          String? // If transaction paid a bill
+  bill            Bill? @relation(fields: [billId], references: [id])
+  journalEntryId  String? // Associated journal entry
+  journalEntry    JournalEntry? @relation(fields: [journalEntryId], references: [id])
+  accountId       String? // For account association
+  account         Account? @relation("AccountTransactions", fields: [accountId], references: [id])
+  receiptId       String? @unique // If created from receipt capture
+  receipt         Receipt? @relation(fields: [receiptId], references: [id])
+  
+  // Raw Data
+  rawData         Json? // Original CSV/OFX data
+  metadata        Json? // Additional processing metadata
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("bank_transactions")
+}
+
+model Receipt {
+  id                String @id @default(cuid())
+  filename          String
+  originalImage     String // Base64 encoded image
+  mimeType          String
+  fileSize          Int
+  location          String? // Where receipt was captured
+  notes             String?
+  
+  // Extracted Receipt Data (from Claude Vision)
+  vendor            String?
+  date              DateTime?
+  totalAmount       Decimal?
+  taxAmount         Decimal?
+  items             Json? // Array of receipt items
+  paymentMethod     String?
+  receiptNumber     String?
+  address           String?
+  
+  // OCR Results
+  extractedText     String? // Raw text from receipt
+  confidence        Decimal? // OCR confidence score
+  
+  // Processing Status
+  processed         Boolean @default(false)
+  needsReview       Boolean @default(false)
+  
+  // Linked Records
+  bankTransactionId String? @unique // Associated transaction
+  bankTransaction   BankTransaction?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("receipts")
+}
+
+enum BankAccountType {
+  BLUEVINE_CHECKING
+  AMEX_CREDIT
+  OTHER_CHECKING
+  OTHER_CREDIT
+  SAVINGS
+  PAYPAL
+  RECEIPT_CAPTURE
+}
+
+model Bill {
+  id              String @id @default(cuid())
+  billNumber      String @unique
+  vendor          String
+  amount          Decimal
+  dueDate         DateTime
+  issueDate       DateTime @default(now())
+  status          BillStatus @default(PENDING)
+  paidDate        DateTime?
+  paymentReference String? // Reference to payment transaction
+  
+  // Purchase Order Reference
+  poNumber        String?
+  purchaseOrder   PurchaseOrder? @relation(fields: [poNumber], references: [poNumber])
+  
+  // Line Items
+  items           BillItem[]
+  
+  // Payments
+  payments        BillPayment[]
+  transactions    BankTransaction[]
+  
+  description     String?
+  notes           String?
+  metadata        Json?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("bills")
+}
+
+model BillItem {
+  id          String @id @default(cuid())
+  billId      String
+  bill        Bill @relation(fields: [billId], references: [id], onDelete: Cascade)
+  
+  description String
+  quantity    Int
+  unitPrice   Decimal
+  totalPrice  Decimal
+  
+  // Product reference if applicable
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  
+  createdAt DateTime @default(now())
+
+  @@map("bill_items")
+}
+
+model BillPayment {
+  id            String @id @default(cuid())
+  billId        String
+  bill          Bill @relation(fields: [billId], references: [id], onDelete: Cascade)
+  
+  amount        Decimal
+  paymentDate   DateTime
+  method        PaymentMethod
+  reference     String? // Transaction reference
+  
+  createdAt DateTime @default(now())
+
+  @@map("bill_payments")
+}
+
+enum BillStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+  DISPUTED
+}
+
+model PurchaseOrder {
+  id          String @id @default(cuid())
+  poNumber    String @unique
+  vendor      String
+  amount      Decimal
+  orderDate   DateTime @default(now())
+  expectedDate DateTime?
+  status      POStatus @default(PENDING)
+  
+  // Items
+  items       POItem[]
+  
+  // Related Bills
+  bills       Bill[]
+  
+  notes       String?
+  metadata    Json?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("purchase_orders")
+}
+
+model POItem {
+  id          String @id @default(cuid())
+  poId        String
+  po          PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+  
+  description String
+  quantity    Int
+  unitPrice   Decimal
+  totalPrice  Decimal
+  
+  // Product reference if applicable
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  
+  createdAt DateTime @default(now())
+
+  @@map("po_items")
+}
+
+enum POStatus {
+  PENDING
+  SENT
+  ACKNOWLEDGED
+  RECEIVED
+  CANCELLED
+}
+
+// ========================================
 // ASSET MANAGEMENT
 // ========================================
 
@@ -684,6 +909,9 @@ model Asset {
   
   // Images stored in Cloudinary
   images                Json? // Array of image objects with url, publicId, caption, isPrimary
+  
+  // Bank transaction relationship (for auto-created assets)
+  bankTransactions      BankTransaction[]
   
   // Additional information
   notes                 String?

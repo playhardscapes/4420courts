@@ -22,7 +22,10 @@ import {
   DocumentDuplicateIcon,
   ClipboardDocumentListIcon,
   WrenchScrewdriverIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  ArrowsRightLeftIcon,
+  CpuChipIcon,
+  CameraIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -33,6 +36,38 @@ const navigation = [
   { name: 'Contracts', href: '/contracts', icon: DocumentDuplicateIcon },
   { name: 'Projects', href: '/projects', icon: WrenchScrewdriverIcon },
   { name: 'Invoices', href: '/invoices', icon: BanknotesIcon },
+  { 
+    name: 'AI Transactions', 
+    href: '/transactions', 
+    icon: CpuChipIcon,
+    badge: 'AI',
+    children: [
+      { name: 'Import & Categorize', href: '/transactions' },
+      { name: 'Review Transactions', href: '/transactions/review' },
+      { name: 'Bills & Payments', href: '/transactions/bills' }
+    ]
+  },
+  { 
+    name: '📷 Receipt Capture', 
+    href: '/receipts', 
+    icon: CameraIcon,
+    badge: 'NEW',
+    children: [
+      { name: 'Capture Receipts', href: '/receipts' },
+      { name: 'Receipt History', href: '/receipts/history' }
+    ]
+  },
+  { 
+    name: 'Asset Management', 
+    href: '/assets', 
+    icon: CubeIcon,
+    children: [
+      { name: 'Assets', href: '/assets' },
+      { name: 'Suppliers', href: '/suppliers' },
+      { name: 'Shopping List', href: '/shopping-list' },
+      { name: 'Maintenance', href: '/maintenance' }
+    ]
+  },
   { 
     name: 'Accounting', 
     href: '/accounting', 
