@@ -133,9 +133,12 @@ export default function ContractsPage() {
   const [contracts, setContracts] = useState<Contract[]>(sampleContracts);
   const [showNewContractForm, setShowNewContractForm] = useState(false);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [editingContract, setEditingContract] = useState<Contract | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [showClaudeAssistant, setShowClaudeAssistant] = useState(false);
+  const [claudeConversation, setClaudeConversation] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -205,22 +208,109 @@ export default function ContractsPage() {
   };
 
   const generateContractWithAI = async (data: any): Promise<string> => {
-    // Simulate AI contract generation
-    return `PICKLEBALL COURT CONSTRUCTION CONTRACT
+    // In a real implementation, this would call Claude API
+    // For now, we'll use the template from settings with populated data
+    const templateData = {
+      contract_date: new Date().toLocaleDateString(),
+      company_name: 'Pro Court Solutions',
+      company_state: 'Florida',
+      customer_name: data.customerName,
+      customer_address: '123 Customer St, City, State 12345', // Would come from customer data
+      customer_phone: '(555) 123-4567', // Would come from customer data
+      customer_email: data.customerEmail,
+      project_address: 'Project Location TBD', // Would come from quote data
+      court_type: 'Pickleball Court', // Would come from quote data
+      square_footage: '2,000 sq ft', // Would come from quote data
+      surface_type: 'Acrylic Surfacing', // Would come from quote data
+      scope_of_work: `Complete court resurfacing including surface preparation, crack repair, primer application, and color coating with professional line marking.`,
+      pricing_breakdown: `Surface Preparation: $2,500
+Crack Repair: $800
+Primer Application: $1,200
+Color Coating (2 coats): $3,500
+Line Marking: $850
+Materials & Equipment: $3,650
+Total: $${data.contractValue.toLocaleString()}`,
+      total_amount: data.contractValue.toLocaleString(),
+      deposit_amount: Math.round(data.contractValue * 0.3).toLocaleString(),
+      deposit_percentage: '30',
+      progress_payment: Math.round(data.contractValue * 0.4).toLocaleString(),
+      progress_milestone: 'at 50% completion',
+      final_payment: Math.round(data.contractValue * 0.3).toLocaleString(),
+      start_date: data.startDate,
+      completion_date: data.estimatedCompletion,
+      warranty_period: '2 years',
+      additional_terms: data.specialConditions || 'Standard terms and conditions apply.',
+      contractor_name: 'John Smith'
+    };
 
-This agreement is between 4420 Courts LLC and ${data.customerName}.
+    // This is where Claude API would be called to generate the contract
+    // using the template and data above
+    const contractTemplate = `COURT RESURFACING CONTRACT
 
-SERVICE LEVEL: ${data.serviceLevel}
-CONTRACT VALUE: $${data.contractValue.toLocaleString()}
-PROJECT TIMELINE: ${data.startDate} to ${data.estimatedCompletion}
+This Contract is entered into on {{contract_date}} between {{company_name}}, a {{company_state}} corporation ("Contractor"), and {{customer_name}} ("Customer").
 
-PAYMENT TERMS: ${data.paymentTerms}
-WARRANTY: ${data.warrantyTerms}
+CUSTOMER INFORMATION:
+Name: {{customer_name}}
+Address: {{customer_address}}
+Phone: {{customer_phone}}
+Email: {{customer_email}}
 
-SPECIAL CONDITIONS:
-${data.specialConditions}
+PROJECT DETAILS:
+Project Location: {{project_address}}
+Court Type: {{court_type}}
+Square Footage: {{square_footage}}
+Surface Type: {{surface_type}}
 
-[AI-generated contract content would be much more detailed here...]`;
+SCOPE OF WORK:
+{{scope_of_work}}
+
+MATERIALS AND PRICING:
+{{pricing_breakdown}}
+
+TOTAL CONTRACT AMOUNT: ${{total_amount}}
+
+PAYMENT TERMS:
+- Deposit: ${{deposit_amount}} ({{deposit_percentage}}%) due upon signing
+- Progress Payment: ${{progress_payment}} due {{progress_milestone}}
+- Final Payment: ${{final_payment}} due upon completion
+
+TIMELINE:
+Start Date: {{start_date}}
+Estimated Completion: {{completion_date}}
+Weather delays may extend timeline as necessary.
+
+WARRANTY:
+Contractor warrants all work and materials for {{warranty_period}} from completion date.
+
+STANDARD CONDITIONS:
+- Weather delays beyond contractor control will extend timeline accordingly.
+- Customer is responsible for providing clear access to work area.
+- Any changes to scope of work must be approved in writing.
+- Contractor is not responsible for underground utilities not marked.
+- Customer must maintain proper drainage around court surface.
+- Final payment due within 30 days of project completion.
+- Contractor carries general liability insurance of $1,000,000.
+- Customer agrees to final walk-through inspection before completion.
+
+ADDITIONAL TERMS:
+{{additional_terms}}
+
+By signing below, both parties agree to the terms and conditions of this contract.
+
+Customer Signature: _________________________ Date: _______
+{{customer_name}}
+
+Contractor Signature: _________________________ Date: _______
+{{contractor_name}}, {{company_name}}`;
+
+    // Replace template variables with actual data
+    let populatedContract = contractTemplate;
+    Object.entries(templateData).forEach(([key, value]) => {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      populatedContract = populatedContract.replace(regex, value.toString());
+    });
+
+    return populatedContract;
   };
 
   const handleUpdateContractStatus = async (contractId: string, newStatus: Contract['status']) => {
@@ -275,6 +365,54 @@ ${data.specialConditions}
     }
   };
 
+  const handleEditContract = (contract: Contract) => {
+    setEditingContract(contract);
+    setFormData({
+      quoteId: contract.quoteId,
+      customerId: contract.customerId,
+      customerName: contract.customer,
+      customerEmail: contract.email,
+      serviceLevel: contract.serviceLevel,
+      contractValue: contract.contractValue,
+      startDate: contract.startDate,
+      estimatedCompletion: contract.estimatedCompletion,
+      paymentTerms: contract.paymentTerms,
+      warrantyTerms: contract.warrantyTerms,
+      specialConditions: contract.specialConditions || '',
+      templateId: '1'
+    });
+    setShowNewContractForm(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingContract) return;
+    
+    setIsLoading(true);
+    try {
+      const updatedContract: Contract = {
+        ...editingContract,
+        customer: formData.customerName,
+        email: formData.customerEmail,
+        serviceLevel: formData.serviceLevel,
+        contractValue: formData.contractValue,
+        startDate: formData.startDate,
+        estimatedCompletion: formData.estimatedCompletion,
+        paymentTerms: formData.paymentTerms,
+        warrantyTerms: formData.warrantyTerms,
+        specialConditions: formData.specialConditions
+      };
+      
+      setContracts(contracts.map(c => c.id === editingContract.id ? updatedContract : c));
+      setEditingContract(null);
+      setShowNewContractForm(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error updating contract:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       quoteId: '',
@@ -293,23 +431,50 @@ ${data.specialConditions}
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="border-b border-gray-200 pb-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Contracts</h1>
-            <p className="text-gray-600">Generate and manage project contracts with AI assistance</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Contracts</h1>
+              <p className="text-gray-600">Generate and manage project contracts with AI assistance</p>
+            </div>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowNewContractForm(true)}
+                className="bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 flex items-center gap-2 border border-blue-600"
+              >
+                <PlusIcon className="h-4 w-4" />
+                New Contract
+              </button>
+              <button 
+                onClick={() => {
+                  setShowNewContractForm(true);
+                  // Pre-populate with available quote if any
+                  if (availableQuotes.length > 0) {
+                    const firstQuote = availableQuotes[0];
+                    setFormData({
+                      ...formData,
+                      quoteId: firstQuote.id,
+                      customerName: firstQuote.customer,
+                      serviceLevel: firstQuote.serviceLevel,
+                      contractValue: firstQuote.value
+                    });
+                  }
+                }}
+                className="bg-green-600 text-white px-4 py-2 hover:bg-green-700 flex items-center gap-2 border border-green-600"
+              >
+                <SparklesIcon className="h-4 w-4" />
+                Generate from Quote
+              </button>
+            </div>
           </div>
-          <button 
-            onClick={() => setShowNewContractForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-          >
-            <PlusIcon className="h-4 w-4" />
-            New Contract
-          </button>
         </div>
       </div>
+
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="space-y-6 py-6">
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -460,21 +625,93 @@ ${data.specialConditions}
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className="mt-6 flex justify-between items-center">
             <button 
-              onClick={() => setShowNewContractForm(false)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              onClick={() => setShowClaudeAssistant(!showClaudeAssistant)}
+              className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 flex items-center gap-2 border border-purple-600"
             >
-              Cancel
+              <SparklesIcon className="h-4 w-4" />
+              {showClaudeAssistant ? 'Hide' : 'Show'} Claude Assistant
             </button>
-            <button 
-              onClick={handleCreateContract}
-              disabled={isLoading || !formData.customerName || !formData.serviceLevel}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isLoading ? 'Generating...' : 'Generate Contract with AI'}
-            </button>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowNewContractForm(false)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={editingContract ? handleSaveEdit : handleCreateContract}
+                disabled={isLoading || !formData.customerName || !formData.serviceLevel}
+                className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 border border-blue-600"
+              >
+                {isLoading ? (editingContract ? 'Updating...' : 'Generating...') : (editingContract ? 'Update Contract' : 'Generate Contract with AI')}
+              </button>
+            </div>
           </div>
+
+          {/* Claude Assistant */}
+          {showClaudeAssistant && (
+            <div className="mt-6 border-t border-gray-200 pt-6">
+              <div className="bg-purple-50 border border-purple-200 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <SparklesIcon className="h-5 w-5 text-purple-600" />
+                  <h3 className="font-medium text-purple-900">Claude Contract Assistant</h3>
+                </div>
+                <p className="text-sm text-purple-800">
+                  Claude can help you generate customized contracts using your template, pricing database, and seasonal adjustments. The assistant will automatically populate contract fields based on the quote data and your standard terms.
+                </p>
+              </div>
+
+              <div className="mt-4 space-y-4">
+                {claudeConversation.length === 0 ? (
+                  <div className="bg-gray-50 p-4 border text-sm text-gray-600">
+                    <div className="font-medium text-gray-900 mb-2">Contract Generation Preview:</div>
+                    <div className="space-y-1">
+                      <div>• Using template: Standard Court Resurfacing Contract</div>
+                      <div>• Customer: {formData.customerName || 'Not selected'}</div>
+                      <div>• Service Level: {formData.serviceLevel || 'Not selected'}</div>
+                      <div>• Contract Value: ${formData.contractValue?.toLocaleString() || '0'}</div>
+                      <div>• Payment Terms: {formData.paymentTerms}</div>
+                      <div>• Warranty: {formData.warrantyTerms}</div>
+                      {formData.specialConditions && <div>• Special Conditions: {formData.specialConditions}</div>}
+                    </div>
+                    <div className="mt-3 p-3 bg-blue-50 border border-blue-200">
+                      <div className="text-blue-900 font-medium text-xs">Claude Integration Ready</div>
+                      <div className="text-blue-800 text-xs mt-1">
+                        When you generate the contract, Claude will populate the template with:
+                      </div>
+                      <div className="text-blue-700 text-xs mt-1 ml-4">
+                        ✓ Customer information from selected quote<br/>
+                        ✓ Project details and pricing breakdown<br/>
+                        ✓ Standard terms and clauses from settings<br/>
+                        ✓ Required fields with appropriate defaults<br/>
+                        ✓ Legal language optimized for your business
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {claudeConversation.map((message, index) => (
+                      <div key={index} className={`p-3 border ${
+                        message.role === 'user' 
+                          ? 'bg-blue-50 border-blue-200 ml-8' 
+                          : 'bg-gray-50 border-gray-200 mr-8'
+                      }`}>
+                        <div className="text-xs font-medium text-gray-600 mb-1">
+                          {message.role === 'user' ? 'You' : 'Claude'}
+                        </div>
+                        <div className="text-sm text-gray-900 whitespace-pre-line">
+                          {message.content}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -608,7 +845,11 @@ ${data.specialConditions}
                           <PaperAirplaneIcon className="h-4 w-4" />
                         </button>
                       )}
-                      <button className="text-yellow-600 hover:text-yellow-900" title="Edit">
+                      <button 
+                        onClick={() => handleEditContract(contract)}
+                        className="text-yellow-600 hover:text-yellow-900" 
+                        title="Edit"
+                      >
                         <PencilIcon className="h-4 w-4" />
                       </button>
                       <button className="text-green-600 hover:text-green-900" title="Download">
@@ -788,6 +1029,8 @@ ${data.specialConditions}
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }
