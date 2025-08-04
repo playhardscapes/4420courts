@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Customer, getAllCustomers, getCustomerDisplayName } from '../../data/customers';
 import { 
   CalendarIcon, 
   PlusIcon, 
@@ -15,7 +16,8 @@ import {
   ClockIcon,
   UserIcon,
   CheckCircleIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  LinkIcon
 } from '@heroicons/react/24/outline';
 
 interface CalendarEvent {
@@ -48,53 +50,61 @@ interface Project {
   }[];
 }
 
-// Mock calendar events - will be replaced with database queries
+// Mock calendar events - linked to actual customers
 const mockEvents: CalendarEvent[] = [
   {
     id: '1',
-    title: 'Initial Consultation - Johnson Family',
-    customer: 'Mike Johnson',
+    title: 'Initial Consultation - Riverside Estates HOA',
+    customerId: 'cust_hoa_001',
+    customer: 'Sarah Davis',
     type: 'consultation',
-    startTime: new Date(2025, 0, 29, 10, 0), // Today, 10:00 AM
-    endTime: new Date(2025, 0, 29, 10, 30),
+    startTime: new Date(2025, 1, 3, 10, 0), // Feb 3, 10:00 AM
+    endTime: new Date(2025, 1, 3, 11, 0),
     status: 'confirmed',
-    notes: 'Interested in Level 3 service - backyard court project',
+    location: '5678 Riverside Drive, Cary, NC 27519',
+    notes: 'Board approved consultation for tennis court resurfacing project',
     priority: 'high',
     assignedTo: 'John Doe'
   },
   {
     id: '2',
-    title: 'Site Visit - Davis Court Project',
-    customer: 'Sarah Davis',
+    title: 'Site Visit - Botetourt County Courts 3 & 4',
+    customerId: 'cust_municipality_001',
+    customer: 'John Smith',
     type: 'site_visit',
-    startTime: new Date(2025, 0, 29, 14, 0), // Today, 2:00 PM
-    endTime: new Date(2025, 0, 29, 15, 30),
+    startTime: new Date(2025, 1, 5, 14, 0), // Feb 5, 2:00 PM
+    endTime: new Date(2025, 1, 5, 15, 30),
     status: 'scheduled',
-    location: '123 Oak Street, Springfield, IL',
-    priority: 'medium',
+    location: '150 Scruggs Road, Cloverdale, VA 24077',
+    priority: 'high',
+    notes: 'Site assessment for courts 3 & 4 resurfacing project',
     projectId: 'P-2025-001'
   },
   {
     id: '3',
-    title: 'Project Start - Wilson Court',
-    customer: 'Tom Wilson',
+    title: 'Project Start - Elite Sports Academy',
+    customerId: 'cust_business_001',
+    customer: 'Elite Sports Academy',
     type: 'project_start',
-    startTime: new Date(2025, 0, 30, 8, 0), // Tomorrow, 8:00 AM
-    endTime: new Date(2025, 0, 30, 17, 0),
+    startTime: new Date(2025, 1, 10, 8, 0), // Feb 10, 8:00 AM
+    endTime: new Date(2025, 1, 10, 17, 0),
     status: 'scheduled',
     priority: 'high',
+    location: '1000 Academy Drive, Virginia Beach, VA 23456',
     projectId: 'P-2025-002'
   },
   {
     id: '4',
-    title: 'Surface Prep Milestone',
-    customer: 'Sarah Smith',
-    type: 'project_milestone',
-    startTime: new Date(2025, 1, 5, 9, 0), // Feb 5
-    endTime: new Date(2025, 1, 5, 17, 0),
+    title: 'Individual Consultation - Aric Holsinger',
+    customerId: 'cust_individual_001',
+    customer: 'Aric Holsinger',
+    type: 'consultation',
+    startTime: new Date(2025, 1, 7, 9, 0), // Feb 7, 9:00 AM
+    endTime: new Date(2025, 1, 7, 10, 0),
     status: 'scheduled',
     priority: 'medium',
-    projectId: 'P-2025-001'
+    location: '123 Residential Court, Individual Home',
+    notes: 'Level 3 service consultation for residential court project'
   }
 ];
 
@@ -193,12 +203,20 @@ const getEventColor = (type: string) => {
 
 export default function CalendarPage() {
   const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [projects] = useState<Project[]>(mockProjects);
   const [showNewEventForm, setShowNewEventForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [currentView, setCurrentView] = useState<'day' | 'week' | 'month' | 'timeline'>('day');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
+
+  // Load customers
+  useEffect(() => {
+    const allCustomers = getAllCustomers();
+    setCustomers(allCustomers);
+  }, []);
 
   // Form state for new events
   const [formData, setFormData] = useState({
@@ -227,6 +245,29 @@ export default function CalendarPage() {
   const activeProjects = projects.filter(project => 
     project.status === 'in_progress' || project.status === 'planning'
   );
+
+  const getLinkedCustomer = (event: CalendarEvent): Customer | null => {
+    if (!event.customerId) return null;
+    return customers.find(c => c.id === event.customerId) || null;
+  };
+
+  const getCustomerInfo = (event: CalendarEvent) => {
+    const linkedCustomer = getLinkedCustomer(event);
+    if (linkedCustomer) {
+      return {
+        name: getCustomerDisplayName(linkedCustomer),
+        organization: linkedCustomer.organizationType !== 'INDIVIDUAL' ? linkedCustomer.companyName : null,
+        status: linkedCustomer.customerStatus,
+        linked: true
+      };
+    }
+    return {
+      name: event.customer,
+      organization: null,
+      status: null,
+      linked: false
+    };
+  };
 
   const handleCreateEvent = async () => {
     setIsLoading(true);
@@ -287,6 +328,59 @@ export default function CalendarPage() {
     }
   };
 
+  const handleEditEvent = (event: CalendarEvent) => {
+    setEditingEvent(event);
+    setFormData({
+      title: event.title,
+      type: event.type,
+      customer: event.customer,
+      projectId: event.projectId || '',
+      startDate: event.startTime.toISOString().split('T')[0],
+      startTime: event.startTime.toTimeString().slice(0, 5),
+      endTime: event.endTime.toTimeString().slice(0, 5),
+      location: event.location || '',
+      notes: event.notes || '',
+      priority: event.priority,
+      assignedTo: event.assignedTo || ''
+    });
+    setShowNewEventForm(true);
+  };
+
+  const handleUpdateEvent = async () => {
+    if (!editingEvent) return;
+    
+    setIsLoading(true);
+    try {
+      const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
+      const endDateTime = new Date(`${formData.startDate}T${formData.endTime}`);
+
+      const updatedEvent: CalendarEvent = {
+        ...editingEvent,
+        title: formData.title,
+        type: formData.type,
+        customer: formData.customer,
+        projectId: formData.projectId || undefined,
+        startTime: startDateTime,
+        endTime: endDateTime,
+        location: formData.location || undefined,
+        notes: formData.notes || undefined,
+        priority: formData.priority,
+        assignedTo: formData.assignedTo || undefined
+      };
+
+      setEvents(events.map(event => 
+        event.id === editingEvent.id ? updatedEvent : event
+      ));
+      setShowNewEventForm(false);
+      setEditingEvent(null);
+      resetForm();
+    } catch (error) {
+      console.error('Error updating event:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -301,6 +395,7 @@ export default function CalendarPage() {
       priority: 'medium',
       assignedTo: ''
     });
+    setEditingEvent(null);
   };
 
   const navigateDate = (direction: 'prev' | 'next') => {
@@ -420,6 +515,9 @@ export default function CalendarPage() {
                   <div className="space-y-4">
                     {todayEvents.map((event) => {
                       const IconComponent = getEventIcon(event.type);
+                      const customerInfo = getCustomerInfo(event);
+                      const linkedCustomer = getLinkedCustomer(event);
+                      
                       return (
                         <div key={event.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
                           <div className="flex items-start justify-between">
@@ -428,48 +526,93 @@ export default function CalendarPage() {
                                 <IconComponent className="w-5 h-5 text-blue-600" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                                <p className="text-sm text-gray-600">with {event.customer}</p>
-                                <div className="flex items-center mt-1 space-x-4">
-                                  <span className="text-sm text-gray-500">
-                                    {event.startTime.toLocaleTimeString('en-US', { 
-                                      hour: 'numeric', 
-                                      minute: '2-digit',
-                                      hour12: true 
-                                    })} - {event.endTime.toLocaleTimeString('en-US', { 
-                                      hour: 'numeric', 
-                                      minute: '2-digit',
-                                      hour12: true 
-                                    })}
-                                  </span>
-                                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(event.status)}`}>
-                                    {event.status}
-                                  </span>
-                                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(event.priority)}`}>
-                                    {event.priority}
-                                  </span>
+                                <div className="flex items-center space-x-2 mb-1">
+                                  <h3 className="font-semibold text-gray-900">{event.title}</h3>
+                                  {customerInfo.linked ? (
+                                    <div className="flex items-center space-x-1">
+                                      <LinkIcon className="w-4 h-4 text-green-600" />
+                                      <span className="text-xs text-green-600 font-medium">Linked Customer</span>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center space-x-1">
+                                      <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600" />
+                                      <span className="text-xs text-yellow-600 font-medium">No Customer Link</span>
+                                    </div>
+                                  )}
                                 </div>
+                                
+                                <div className="space-y-1">
+                                  <div className="flex items-center space-x-2">
+                                    <UserIcon className="w-4 h-4 text-gray-400" />
+                                    <span className="text-sm text-gray-600">
+                                      {customerInfo.name}
+                                      {customerInfo.organization && (
+                                        <span className="text-gray-500"> • {customerInfo.organization}</span>
+                                      )}
+                                    </span>
+                                    {customerInfo.status && (
+                                      <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded">
+                                        {customerInfo.status.replace('_', ' ')}
+                                      </span>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="flex items-center mt-1 space-x-4">
+                                    <div className="flex items-center space-x-1">
+                                      <ClockIcon className="w-4 h-4 text-gray-400" />
+                                      <span className="text-sm text-gray-500">
+                                        {event.startTime.toLocaleTimeString('en-US', { 
+                                          hour: 'numeric', 
+                                          minute: '2-digit',
+                                          hour12: true 
+                                        })} - {event.endTime.toLocaleTimeString('en-US', { 
+                                          hour: 'numeric', 
+                                          minute: '2-digit',
+                                          hour12: true 
+                                        })}
+                                      </span>
+                                    </div>
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(event.status)}`}>
+                                      {event.status}
+                                    </span>
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(event.priority)}`}>
+                                      {event.priority}
+                                    </span>
+                                  </div>
+                                </div>
+                                
                                 {event.location && (
-                                  <p className="text-sm text-gray-500 mt-1">📍 {event.location}</p>
+                                  <div className="flex items-start space-x-1 mt-2">
+                                    <MapPinIcon className="w-4 h-4 text-gray-400 mt-0.5" />
+                                    <p className="text-sm text-gray-500">{event.location}</p>
+                                  </div>
                                 )}
+                                
                                 {event.notes && (
-                                  <p className="text-sm text-gray-600 mt-2">{event.notes}</p>
+                                  <p className="text-sm text-gray-600 mt-2 bg-gray-50 p-2 rounded">{event.notes}</p>
                                 )}
                               </div>
                             </div>
-                            <div className="flex space-x-2">
+                            
+                            <div className="flex flex-col space-y-2 ml-4">
                               <button 
                                 onClick={() => setSelectedEvent(event)}
-                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                className="flex items-center justify-center w-8 h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+                                title="View Details"
                               >
                                 <EyeIcon className="w-4 h-4" />
                               </button>
-                              <button className="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+                              <button 
+                                onClick={() => handleEditEvent(event)}
+                                className="flex items-center justify-center w-8 h-8 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 rounded-md transition-colors"
+                                title="Edit Event"
+                              >
                                 <PencilIcon className="w-4 h-4" />
                               </button>
                               <button 
                                 onClick={() => handleDeleteEvent(event.id)}
-                                className="text-red-600 hover:text-red-700 text-sm font-medium"
+                                className="flex items-center justify-center w-8 h-8 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                                title="Delete Event"
                               >
                                 <TrashIcon className="w-4 h-4" />
                               </button>
@@ -568,15 +711,21 @@ export default function CalendarPage() {
               <div className="space-y-3">
                 {upcomingEvents.map((event) => {
                   const IconComponent = getEventIcon(event.type);
+                  const customerInfo = getCustomerInfo(event);
                   return (
-                    <div key={event.id} className="flex items-center space-x-3 py-2">
+                    <div key={event.id} className="flex items-center space-x-3 py-2 hover:bg-gray-50 rounded-lg px-2 -mx-2 transition-colors cursor-pointer" onClick={() => setSelectedEvent(event)}>
                       <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                         <IconComponent className="w-4 h-4 text-gray-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {event.customer}
-                        </p>
+                        <div className="flex items-center space-x-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {customerInfo.name}
+                          </p>
+                          {customerInfo.linked && (
+                            <LinkIcon className="w-3 h-3 text-green-600 flex-shrink-0" />
+                          )}
+                        </div>
                         <p className="text-xs text-gray-500">
                           {event.startTime.toLocaleDateString('en-US', { 
                             month: 'short', 
@@ -587,6 +736,21 @@ export default function CalendarPage() {
                             hour12: true 
                           })}
                         </p>
+                        {customerInfo.organization && (
+                          <p className="text-xs text-gray-400 truncate">{customerInfo.organization}</p>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditEvent(event);
+                          }}
+                          className="text-gray-400 hover:text-gray-600"
+                          title="Edit Event"
+                        >
+                          <PencilIcon className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   );
@@ -679,7 +843,9 @@ export default function CalendarPage() {
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-full overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">Schedule New Event</h2>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {editingEvent ? 'Edit Event' : 'Schedule New Event'}
+                </h2>
                 <button 
                   onClick={() => {
                     setShowNewEventForm(false);
@@ -843,11 +1009,11 @@ export default function CalendarPage() {
                   Cancel
                 </button>
                 <button 
-                  onClick={handleCreateEvent}
+                  onClick={editingEvent ? handleUpdateEvent : handleCreateEvent}
                   disabled={isLoading || !formData.title || !formData.customer}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {isLoading ? 'Creating...' : 'Create Event'}
+                  {isLoading ? (editingEvent ? 'Updating...' : 'Creating...') : (editingEvent ? 'Update Event' : 'Create Event')}
                 </button>
               </div>
             </div>
@@ -1014,7 +1180,13 @@ export default function CalendarPage() {
                   >
                     Close
                   </button>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                  <button 
+                    onClick={() => {
+                      handleEditEvent(selectedEvent);
+                      setSelectedEvent(null);
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
                     Edit Event
                   </button>
                 </div>

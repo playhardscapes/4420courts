@@ -1234,9 +1234,6 @@
   .pl-16 {
     padding-left: calc(var(--spacing) * 16);
   }
-  .pl-20 {
-    padding-left: calc(var(--spacing) * 20);
-  }
   .text-center {
     text-align: center;
   }
@@ -1387,6 +1384,9 @@
   }
   .text-red-600 {
     color: var(--color-red-600);
+  }
+  .text-red-700 {
+    color: var(--color-red-700);
   }
   .text-red-800 {
     color: var(--color-red-800);

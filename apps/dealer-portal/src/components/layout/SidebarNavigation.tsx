@@ -25,13 +25,15 @@ import {
   BanknotesIcon,
   ArrowsRightLeftIcon,
   CpuChipIcon,
-  CameraIcon
+  CameraIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
   { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
   { name: 'Customers', href: '/customers', icon: UserGroupIcon },
+  { name: 'Prospects', href: '/prospects', icon: ChatBubbleLeftRightIcon },
   { name: 'Quotes', href: '/quotes', icon: DocumentTextIcon },
   { name: 'Contracts', href: '/contracts', icon: DocumentDuplicateIcon },
   { name: 'Projects', href: '/projects', icon: WrenchScrewdriverIcon },

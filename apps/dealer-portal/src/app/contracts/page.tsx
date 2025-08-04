@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   DocumentDuplicateIcon, 
   PlusIcon, 
@@ -15,6 +15,73 @@ import {
   TrashIcon,
   SparklesIcon
 } from '@heroicons/react/24/outline';
+import { Customer, getAllCustomers, getCustomerDisplayName, getCustomerEmail, getBillingEmail, getBillingContactName } from '../../data/customers';
+
+interface Quote {
+  id: string;
+  quoteNumber: string;
+  customerId: string;
+  customer: string;
+  email: string;
+  serviceLevel: string;
+  estimatedPrice: number;
+  status: 'draft' | 'pending' | 'accepted' | 'rejected' | 'expired';
+  createdDate: string;
+  validUntil: string;
+  description: string;
+  propertyDetails?: {
+    address: string;
+    spaceSize: string;
+    currentSurface: string;
+    timeline: string;
+    specialRequirements: string;
+  };
+}
+
+// Customer data is now imported from shared source
+
+const sampleQuotes: Quote[] = [
+  {
+    id: '1',
+    quoteNumber: 'Q-2025-001',
+    customerId: 'cust_001',
+    customer: 'Aric Holsinger',
+    email: 'aricholsinger@verizon.net',
+    serviceLevel: 'Level 5 - Full Project Management',
+    estimatedPrice: 42500,
+    status: 'accepted',
+    createdDate: '2025-01-28',
+    validUntil: '2025-02-28',
+    description: 'Full basketball court resurfacing with line painting',
+    propertyDetails: {
+      address: '2066 Ambrose Commons, Charlottesville, VA 22903',
+      spaceSize: '94ft x 50ft',
+      currentSurface: 'Cracked asphalt',
+      timeline: '2-3 weeks',
+      specialRequirements: 'Custom logo design'
+    }
+  },
+  {
+    id: '2',
+    quoteNumber: 'Q-2025-002',
+    customerId: 'cust_002',
+    customer: 'Bill Hadley',
+    email: 'bhadley@Thehadcos.com',
+    serviceLevel: 'Level 4 - Project Management + Finish',
+    estimatedPrice: 18750,
+    status: 'accepted',
+    createdDate: '2025-01-29',
+    validUntil: '2025-03-01',
+    description: 'Tennis court resurfacing and net installation',
+    propertyDetails: {
+      address: '8260 Hemlock Ridge Road, Blowing Rock, NC 28605',
+      spaceSize: '78ft x 36ft',
+      currentSurface: 'Faded acrylic',
+      timeline: '1-2 weeks',
+      specialRequirements: 'Weather permitting'
+    }
+  }
+];
 
 interface Contract {
   id: string;
@@ -131,6 +198,7 @@ const getStatusIcon = (status: string) => {
 
 export default function ContractsPage() {
   const [contracts, setContracts] = useState<Contract[]>(sampleContracts);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [showNewContractForm, setShowNewContractForm] = useState(false);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [editingContract, setEditingContract] = useState<Contract | null>(null);
@@ -156,10 +224,23 @@ export default function ContractsPage() {
     templateId: ''
   });
 
-  const availableQuotes = [
-    { id: 'Q-2025-001', customer: 'Mike Johnson', serviceLevel: 'Level 5', value: 42500, status: 'accepted' },
-    { id: 'Q-2025-003', customer: 'Robert Davis', serviceLevel: 'Level 4', value: 22000, status: 'accepted' }
-  ];
+  // Only show accepted quotes for contract creation
+  const availableQuotes = sampleQuotes.filter(quote => quote.status === 'accepted').map(quote => ({
+    id: quote.id,
+    quoteNumber: quote.quoteNumber,
+    customerId: quote.customerId,
+    customer: quote.customer,
+    serviceLevel: quote.serviceLevel,
+    value: quote.estimatedPrice,
+    status: quote.status,
+    description: quote.description
+  }));
+
+  // Load all customers from shared data source
+  useEffect(() => {
+    const allCustomers = getAllCustomers();
+    setCustomers(allCustomers);
+  }, []);
 
   const filteredContracts = contracts.filter(contract => {
     const matchesSearch = 
@@ -524,15 +605,26 @@ Contractor Signature: _________________________ Date: _______
                   onChange={(e) => {
                     const selectedQuote = availableQuotes.find(q => q.id === e.target.value);
                     if (selectedQuote) {
+                      const customer = customers.find(c => c.id === selectedQuote.customerId);
                       setFormData({
                         ...formData,
                         quoteId: e.target.value,
-                        customerName: selectedQuote.customer,
+                        customerId: selectedQuote.customerId,
+                        customerName: customer ? getCustomerDisplayName(customer) : selectedQuote.customer,
+                        customerEmail: customer ? getBillingEmail(customer) : '',
                         serviceLevel: selectedQuote.serviceLevel,
                         contractValue: selectedQuote.value
                       });
                     } else {
-                      setFormData({...formData, quoteId: e.target.value});
+                      setFormData({
+                        ...formData, 
+                        quoteId: e.target.value,
+                        customerId: '',
+                        customerName: '',
+                        customerEmail: '',
+                        serviceLevel: '',
+                        contractValue: 0
+                      });
                     }
                   }}
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -540,10 +632,43 @@ Contractor Signature: _________________________ Date: _______
                   <option value="">Select existing quote</option>
                   {availableQuotes.map((quote) => (
                     <option key={quote.id} value={quote.id}>
-                      {quote.id} - {quote.customer} (${quote.value.toLocaleString()})
+                      {quote.quoteNumber} - {quote.customer} (${quote.value.toLocaleString()}) - {quote.serviceLevel}
                     </option>
                   ))}
                 </select>
+                {formData.quoteId && formData.customerName && (() => {
+                  const selectedQuote = availableQuotes.find(q => q.id === formData.quoteId);
+                  const customer = selectedQuote ? customers.find(c => c.id === selectedQuote.customerId) : null;
+                  return (
+                    <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded">
+                      <p className="text-sm font-medium text-green-800">Selected Quote & Customer Details</p>
+                      <div className="text-sm text-green-700 mt-1">
+                        <div><strong>Quote:</strong> {selectedQuote?.quoteNumber}</div>
+                        <div><strong>Customer:</strong> {formData.customerName}</div>
+                        {customer && customer.organizationType && customer.organizationType !== 'INDIVIDUAL' && (
+                          <div><strong>Type:</strong> {customer.organizationType}</div>
+                        )}
+                        <div><strong>Billing Email:</strong> {formData.customerEmail}</div>
+                        {customer && customer.primaryContact.phone && (
+                          <div><strong>Phone:</strong> {customer.primaryContact.phone}</div>
+                        )}
+                        <div><strong>Service Level:</strong> {formData.serviceLevel}</div>
+                        <div><strong>Contract Value:</strong> ${formData.contractValue?.toLocaleString()}</div>
+                        {customer && customer.billingContact && (
+                          <div className="mt-1">
+                            <strong>Billing Contact:</strong> {getBillingContactName(customer)}
+                            {customer.billingContact.email && ` (${customer.billingContact.email})`}
+                          </div>
+                        )}
+                        {customer && customer.notes && (
+                          <div className="mt-1 text-xs text-green-600">
+                            <strong>Notes:</strong> {customer.notes}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               
               <div>
@@ -643,7 +768,7 @@ Contractor Signature: _________________________ Date: _______
               </button>
               <button 
                 onClick={editingContract ? handleSaveEdit : handleCreateContract}
-                disabled={isLoading || !formData.customerName || !formData.serviceLevel}
+                disabled={isLoading || !formData.quoteId || !formData.serviceLevel}
                 className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 border border-blue-600"
               >
                 {isLoading ? (editingContract ? 'Updating...' : 'Generating...') : (editingContract ? 'Update Contract' : 'Generate Contract with AI')}

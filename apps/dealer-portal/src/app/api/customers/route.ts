@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { CustomerGroup, CustomerStatus } from '@prisma/client';
+import { CustomerGroup } from '@prisma/client';
 
 // GET /api/customers - List all customers with optional filtering
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const group = searchParams.get('group') as CustomerGroup | null;
-    const status = searchParams.get('status') as CustomerStatus | null;
+    const status = searchParams.get('status'); // LEAD, ACTIVE, etc.
     const search = searchParams.get('search');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
@@ -17,25 +17,48 @@ export async function GET(request: NextRequest) {
 
     // Apply filters
     if (group && group !== 'ALL') {
-      where.group = group;
+      where.customerGroup = group;
     }
-    if (status && status !== 'ALL') {
-      where.status = status;
+    
+    // Filter by user status (LEAD vs ACTIVE customers)
+    if (status) {
+      where.user = {
+        status: status
+      };
+    } else {
+      // Default: only show ACTIVE customers (not leads)
+      where.user = {
+        status: 'ACTIVE'
+      };
     }
+    
     if (search) {
+      // Combine search with existing user filter
+      const userFilter = where.user || {};
       where.OR = [
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
-        { companyName: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { phone: { contains: search, mode: 'insensitive' } }
+        { user: { ...userFilter, firstName: { contains: search, mode: 'insensitive' } } },
+        { user: { ...userFilter, lastName: { contains: search, mode: 'insensitive' } } },
+        { user: { ...userFilter, email: { contains: search, mode: 'insensitive' } } },
+        { user: { ...userFilter, phone: { contains: search, mode: 'insensitive' } } },
+        { companyName: { contains: search, mode: 'insensitive' } }
       ];
+      // Remove the direct user filter since it's now in OR conditions
+      delete where.user;
     }
 
     const [customers, total] = await Promise.all([
       prisma.customer.findMany({
         where,
         include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+              phone: true
+            }
+          },
           orders: {
             select: {
               id: true,
@@ -80,23 +103,46 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
+    // First create or find the user
+    let user = await prisma.user.findUnique({
+      where: { email: body.email }
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: body.email,
+          firstName: body.firstName,
+          lastName: body.lastName,
+          phone: body.phone,
+          role: 'CUSTOMER',
+          status: 'ACTIVE',
+          password: body.password || '' // Will need proper auth later
+        }
+      });
+    }
+
+    // Then create the customer record
     const customer = await prisma.customer.create({
       data: {
-        userId: body.userId,
-        firstName: body.firstName,
-        lastName: body.lastName,
+        userId: user.id,
         companyName: body.companyName,
-        email: body.email,
-        phone: body.phone,
-        group: body.group || 'RETAIL',
-        status: body.status || 'ACTIVE',
+        customerGroup: body.customerGroup || 'RETAIL',
         billingAddress: body.billingAddress || null,
         shippingAddress: body.shippingAddress || null,
-        taxExempt: body.taxExempt || false,
-        creditLimit: body.creditLimit || 0,
-        notes: body.notes,
-        metadata: body.metadata || null,
+        taxId: body.taxId || null,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true
+          }
+        }
+      }
     });
 
     return NextResponse.json(customer, { status: 201 });

@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { 
   MapPinIcon,
   ClockIcon,
-  ThermometerIcon,
   CameraIcon,
   ArrowRightIcon,
-  PlayIcon
+  PlayIcon,
+  FireIcon
 } from '@heroicons/react/24/outline';
 
 interface TodayActivity {
@@ -148,7 +148,7 @@ export default function WhereIAmTodayWidget() {
           {/* Weather & Work Status */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
-              <ThermometerIcon className="w-5 h-5 flex-shrink-0" />
+              <FireIcon className="w-5 h-5 flex-shrink-0" />
               <div>
                 <div className="font-semibold">{activity.temperature}°F</div>
                 <div className="text-xs opacity-90">{activity.workStatus}</div>

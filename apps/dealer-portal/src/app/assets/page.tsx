@@ -1,3 +1,5 @@
+'use client';
+
 import { Suspense, useState } from 'react';
 import { AssetManagement } from './components/AssetManagement';
 

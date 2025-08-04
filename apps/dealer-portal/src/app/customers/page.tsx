@@ -41,524 +41,41 @@ interface InvoiceItem {
   lineAmount: number;
 }
 
+import { prisma } from '../../lib/prisma';
+
+// Customer interface matching Prisma schema
 interface Customer {
   id: string;
   userId: string;
   companyName?: string;
-  firstName?: string;
-  lastName?: string;
-  email: string;
-  phone?: string;
-  billingAddress?: any;
-  shippingAddress?: any;
-  customerGroup: 'RETAIL' | 'CONTRACTOR' | 'DEALER' | 'WHOLESALE' | 'LEVEL_3_RESURFACING';
-  createdAt: string;
-  updatedAt: string;
+  billingAddress?: any; // JSON field
+  shippingAddress?: any; // JSON field
+  taxId?: string;
+  customerGroup: 'RETAIL' | 'CONTRACTOR' | 'DEALER' | 'WHOLESALE';
+  metadata?: {
+    convertedFromProspect?: boolean;
+    conversionDate?: string;
+    originalTicketId?: string;
+    prospectData?: {
+      originalInquiry?: string;
+      inquiryDate?: string;
+    };
+  };
+  createdAt: Date;
+  updatedAt: Date;
+  user: {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+  };
   orders?: any[];
-  invoices?: Invoice[];
+  invoices?: any[];
+  _count?: {
+    orders: number;
+  };
 }
-
-// Real customer data imported from CSV
-const sampleCustomers: Customer[] = [
-  {
-    id: "cust_001",
-    userId: "user_001", 
-    firstName: "Aric",
-    lastName: "Holsinger",
-    email: "aricholsinger@verizon.net",
-    phone: "1 703 8514945",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "2066 Ambrose Commons",
-      city: "Charlottesville",
-      state: "VA", 
-      zipCode: "22903"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_002",
-    userId: "user_002",
-    firstName: "Bill",
-    lastName: "Hadley", 
-    email: "bhadley@Thehadcos.com",
-    phone: "1 941 2663589",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "8260 Hemlock Ridge Road",
-      city: "Blowing Rock",
-      state: "NC",
-      zipCode: "28605"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_003",
-    userId: "user_003",
-    email: "vmorales@botetourtva.gov",
-    companyName: "Botetourt County - Parks and Recreation",
-    phone: "1 540 928-2131",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "16 E Main St",
-      city: "Fincastle", 
-      state: "VA",
-      zipCode: "24090"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: [
-      {
-        id: "inv_036",
-        invoiceNumber: "INV-0036",
-        customerId: "cust_003",
-        reference: "Buchanan Tennis Court",
-        invoiceDate: "2025-06-01",
-        dueDate: "2025-06-01",
-        total: 38851.29,
-        taxTotal: 0.00,
-        amountPaid: 0.00,
-        amountDue: 38851.29,
-        status: "Awaiting Payment",
-        items: [
-          {
-            id: "item_036_1",
-            inventoryItemCode: "TEN-RES-FIBER",
-            description: "Contract execution, project mobilization, site preparation, pressure washing, crack preparation and cleaning",
-            quantity: 0.5,
-            unitAmount: 38851.29,
-            lineAmount: 19425.65
-          },
-          {
-            id: "item_036_2",
-            inventoryItemCode: "TEN-RES-FIBER",
-            description: "Deep crack filling with Aquaphalt, surface-level repair, crack isolation system installation, and fiberglass mesh system installation over crack prone areas",
-            quantity: 0.25,
-            unitAmount: 38851.29,
-            lineAmount: 9712.82
-          },
-          {
-            id: "item_036_3",
-            inventoryItemCode: "TEN-RES-FIBER",
-            description: "Flexible resurfacer application (2 coats), color coating (2 coats), line marking for tennis and pickleball courts, equipment installation (pickleball nets), and final inspection",
-            quantity: 0.25,
-            unitAmount: 38851.29,
-            lineAmount: 9712.82
-          }
-        ],
-        createdAt: "2025-06-01",
-        updatedAt: "2025-06-01"
-      },
-      {
-        id: "inv_035",
-        invoiceNumber: "INV-0035",
-        customerId: "cust_003",
-        reference: "Blue Ridge Basketball Courts",
-        invoiceDate: "2025-05-27",
-        dueDate: "2025-05-27",
-        total: 46548.01,
-        taxTotal: 0.00,
-        amountPaid: 46548.01,
-        amountDue: 0.00,
-        status: "Paid",
-        items: [
-          {
-            id: "item_035_1",
-            inventoryItemCode: "TEN-RES-FIBER",
-            description: "Contract execution, project mobilization, site preparation, pressure washing, crack preparation and cleaning, basketball hoop removal and concrete removal",
-            quantity: 0.5,
-            unitAmount: 46548.01,
-            lineAmount: 23274.01
-          },
-          {
-            id: "item_035_2",
-            inventoryItemCode: "TEN-RES-FIBER",
-            description: "Deep crack filling with Aquaphalt, surface-level repair, crack isolation system installation, fiberglass mesh system installation over crack prone areas, and new footer excavation and concrete pouring for basketball hoops",
-            quantity: 0.25,
-            unitAmount: 46548.01,
-            lineAmount: 11637.00
-          },
-          {
-            id: "item_035_3",
-            inventoryItemCode: "TEN-RES-FIBER",
-            description: "Resurfacer application (2 coats), color coating (2 coats), line marking for basketball courts, Dominator 72\" hoop installation, fence tensioning and repair, and final inspection",
-            quantity: 0.25,
-            unitAmount: 46548.01,
-            lineAmount: 11637.00
-          }
-        ],
-        createdAt: "2025-05-27",
-        updatedAt: "2025-05-27"
-      }
-    ]
-  },
-  {
-    id: "cust_004",
-    userId: "user_004",
-    firstName: "Carl",
-    lastName: "Carden",
-    email: "thermolok@aol.com",
-    phone: "1 804 4003168",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "",
-      city: "",
-      state: "",
-      zipCode: ""
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_005", 
-    userId: "user_005",
-    email: "RGriggs@statesvillenc.net",
-    companyName: "City of Statesville - Parks and Recreation",
-    phone: "1 704 8783416",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "P.O. Box 1111",
-      city: "Statesville",
-      state: "NC", 
-      zipCode: "28687"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_006",
-    userId: "user_006",
-    firstName: "David",
-    lastName: "Monroe",
-    email: "d.monroe.law@gmail.com",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "",
-      city: "",
-      state: "",
-      zipCode: ""
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_007",
-    userId: "user_007", 
-    email: "tbrock@hanescc.com",
-    companyName: "Hanes Construction Company",
-    phone: "1 336 956-3000",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "5441 Old Salisbury Rd",
-      city: "Lexington",
-      state: "NC",
-      zipCode: "27295"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_008",
-    userId: "user_008",
-    firstName: "Luke", 
-    lastName: "Erdos",
-    email: "luke.erdos@gmail.com",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "",
-      city: "",
-      state: "",
-      zipCode: ""
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_009",
-    userId: "user_009",
-    firstName: "Mark",
-    lastName: "Aldridge", 
-    email: "aldridgeinvestmentsllc@gmail.com",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "1940 Coffee Road",
-      city: "Lynchburg",
-      state: "VA",
-      zipCode: "24503"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_010",
-    userId: "user_010",
-    firstName: "Mike",
-    lastName: "Arcarese",
-    email: "marcarese@yahoo.com", 
-    phone: "1 212 729-7959",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "410 Kilmarnock Dr",
-      city: "Henrico",
-      state: "VA",
-      zipCode: "23229"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_011",
-    userId: "user_011",
-    firstName: "Mukesh",
-    lastName: "Patel",
-    email: "mpatel@addonllc.com",
-    phone: "1 540 7987644",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "5271 Roselawn Rd", 
-      city: "Roanoke",
-      state: "VA",
-      zipCode: "24018"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_012",
-    userId: "user_012",
-    firstName: "Paul",
-    lastName: "Buskey",
-    email: "pbuskey01@verizon.net",
-    phone: "1 941 3563338",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "1452 Old Buena Vista Rd",
-      city: "Buena Vista",
-      state: "VA",
-      zipCode: "24416"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_013",
-    userId: "user_013",
-    firstName: "Rusty",
-    lastName: "Roberts",
-    email: "roberts.rl@pg.com",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "",
-      city: "",
-      state: "",
-      zipCode: ""
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_014",
-    userId: "user_014",
-    email: "roy_webb@hotmail.com",
-    companyName: "Saint Charles Church of God",
-    phone: "1 276 8705178",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "39496 Veterans Memorial HWY",
-      city: "Pennington Gap",
-      state: "VA", 
-      zipCode: "24277"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_015",
-    userId: "user_015",
-    firstName: "Kelly",
-    lastName: "Callahan",
-    email: "kellyaz2023@outlook.com",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "649 White Oak Dr",
-      city: "Blue Ridge",
-      state: "VA",
-      zipCode: "24064"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_016",
-    userId: "user_016",
-    email: "jhaymans@communitygroup.com",
-    companyName: "Spring Creek - Philip Adams",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "181 Clubhouse Way",
-      city: "Gordonsville",
-      state: "VA",
-      zipCode: "22942"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_017",
-    userId: "user_017",
-    email: "admin@townmanagement.net",
-    companyName: "The Mews - Williamsburg",
-    phone: "1 757 565-6200",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "1166 Jamestown Rd, Ste B",
-      city: "Williamsburg",
-      state: "VA",
-      zipCode: "23185"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: [
-      {
-        id: "inv_037",
-        invoiceNumber: "INV-0037",
-        customerId: "cust_017",
-        reference: "The Mews - Tennis Court",
-        invoiceDate: "2025-06-16",
-        dueDate: "2025-06-16",
-        total: 5387.81,
-        taxTotal: 0.00,
-        amountPaid: 0.00,
-        amountDue: 5387.81,
-        status: "Awaiting Payment",
-        items: [
-          {
-            id: "item_037_1",
-            inventoryItemCode: "TEN-RES-FIBER",
-            description: "Phase One (80% of total project cost): Major crack repairs and patching, Fiberglass mesh installation, First coat of resurfacer and color, Tennis and pickleball line installation, Initial playability restoration",
-            quantity: 0.0,
-            unitAmount: 26939.08,
-            lineAmount: 0.00
-          },
-          {
-            id: "item_037_2",
-            inventoryItemCode: "TEN-RES-FIBER",
-            description: "Phase Two (20% of total project cost): Removal and repair of areas with bonding issues, Additional resurfacer application, Final color coat application, Line touch-ups as needed",
-            quantity: 0.2,
-            unitAmount: 26939.06,
-            lineAmount: 5387.81
-          },
-          {
-            id: "item_037_3",
-            inventoryItemCode: "DOMPICKNET",
-            description: "Dominator Pickleball Net",
-            quantity: 0.0,
-            unitAmount: 400.00,
-            lineAmount: 0.00
-          }
-        ],
-        createdAt: "2025-06-16",
-        updatedAt: "2025-06-16"
-      }
-    ]
-  },
-  {
-    id: "cust_018",
-    userId: "user_018",
-    email: "mark.houseman@omnihotels.com",
-    companyName: "The Omni Homestead Resort",
-    phone: "1 540 8397749",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "7696 Sam Snead Hwy",
-      city: "Hot Springs",
-      state: "VA",
-      zipCode: "24445"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: []
-  },
-  {
-    id: "cust_019",
-    userId: "user_019",
-    email: "jhouchins@southhillva.org",
-    companyName: "Town of South Hill - Jason Houchins", 
-    phone: "1 434 233-7348",
-    customerGroup: "LEVEL_3_RESURFACING",
-    billingAddress: {
-      street: "1205 Hill St",
-      city: "South Hill",
-      state: "VA",
-      zipCode: "23970"
-    },
-    createdAt: "2025-01-30",
-    updatedAt: "2025-01-30",
-    orders: [],
-    invoices: [
-      {
-        id: "inv_038",
-        invoiceNumber: "INV-0038",
-        customerId: "cust_019",
-        reference: "Parker Park Basketball Courts",
-        invoiceDate: "2025-07-07",
-        dueDate: "2025-07-07",
-        total: 80351.10,
-        taxTotal: 0.00,
-        amountPaid: 80351.10,
-        amountDue: 0.00,
-        status: "Paid",
-        items: [
-          {
-            id: "item_038_1",
-            inventoryItemCode: "ATH-ACR-NEW-PAV",
-            description: "Athletic Court Acrylic Coating - New Pavement. Scope of Work Surface- Preparation: Patch low spots left by pavers to ensure an even surface.- Court Surfacing: Apply two coats of resurfacer.- Apply two coats of color (Light Blue Courts with Red Lane) California Sports Surfaces Products used.- Paint all necessary court lines.- Basketball Hoops: Provide and install four Dominator 72\" basketball hoops.Includes cutting asphalt, digging footers, setting bolts, and filling footers.Benches and Trash Cans: Provide and install six benches and six trash cans.",
-            quantity: 1.0,
-            unitAmount: 80351.10,
-            lineAmount: 80351.10
-          }
-        ],
-        createdAt: "2025-07-07",
-        updatedAt: "2025-07-07"
-      }
-    ]
-  }
-];
 
 const customerGroupColors = {
   RETAIL: 'bg-blue-100 text-blue-800',
@@ -568,839 +85,672 @@ const customerGroupColors = {
   LEVEL_3_RESURFACING: 'bg-red-100 text-red-800'
 };
 
+const customerStatusColors = {
+  LEAD: 'bg-yellow-100 text-yellow-800',
+  PROSPECT: 'bg-blue-100 text-blue-800',
+  LEVEL_1: 'bg-gray-100 text-gray-800',
+  LEVEL_2: 'bg-indigo-100 text-indigo-800',
+  LEVEL_3: 'bg-purple-100 text-purple-800',
+  LEVEL_4: 'bg-pink-100 text-pink-800',
+  LEVEL_5: 'bg-red-100 text-red-800',
+  LEVEL_5_5: 'bg-rose-100 text-rose-800',
+  CLIENT: 'bg-green-100 text-green-800',
+  INACTIVE: 'bg-gray-100 text-gray-800',
+  LOST: 'bg-red-100 text-red-800',
+  CLOSED: 'bg-gray-100 text-gray-800'
+};
+
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>(sampleCustomers);
-  const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterGroup, setFilterGroup] = useState('');
+  const [filterGroup, setFilterGroup] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [showConvertProspectModal, setShowConvertProspectModal] = useState(false);
+  const [availableProspects, setAvailableProspects] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Form state
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    companyName: '',
-    customerGroup: 'RETAIL' as Customer['customerGroup'],
-    billingAddress: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: ''
-    }
-  });
+  // Load customers from database on component mount
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/customers');
+        if (response.ok) {
+          const data = await response.json();
+          setCustomers(data.customers); // API returns { customers: [...], pagination: {...} }
+        } else {
+          console.error('Failed to fetch customers');
+        }
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
+    fetchCustomers();
+  }, []);
+
+  // Helper functions for customer data
+  const getCustomerDisplayName = (customer: Customer) => {
+    if (customer.user.firstName && customer.user.lastName) {
+      return `${customer.user.firstName} ${customer.user.lastName}`;
+    }
+    return customer.companyName || customer.user.email || 'Unknown';
+  };
+
+  const isRecentlyConverted = (customer: Customer) => {
+    if (!customer.metadata?.convertedFromProspect) return false;
+    const conversionDate = new Date(customer.metadata.conversionDate);
+    const daysSinceConversion = (Date.now() - conversionDate.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceConversion <= 7; // Show badge for 7 days
+  };
+
+  // Filter customers based on search term and group
   const filteredCustomers = customers.filter(customer => {
+    const displayName = getCustomerDisplayName(customer);
     const matchesSearch = 
-      customer.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.companyName?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesGroup = !filterGroup || customer.customerGroup === filterGroup;
+    const matchesGroup = filterGroup === 'all' || customer.customerGroup === filterGroup;
     
     return matchesSearch && matchesGroup;
   });
 
-  const handleCreateCustomer = async () => {
-    setIsLoading(true);
+  const handleCreateCustomer = async (customerData: any) => {
     try {
-      // API call would go here
-      const newCustomer: Customer = {
-        id: Date.now().toString(),
-        userId: `user_${Date.now()}`,
-        ...formData,
-        createdAt: new Date().toISOString().split('T')[0],
-        updatedAt: new Date().toISOString().split('T')[0]
-      };
+      const response = await fetch('/api/customers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(customerData)
+      });
       
-      setCustomers([newCustomer, ...customers]);
-      setShowNewCustomerForm(false);
-      resetForm();
+      if (response.ok) {
+        const newCustomer = await response.json();
+        setCustomers([...customers, newCustomer]);
+        setShowNewCustomerForm(false);
+        alert('Customer created successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Error creating customer: ${error.error}`);
+      }
     } catch (error) {
       console.error('Error creating customer:', error);
-    } finally {
-      setIsLoading(false);
+      alert('Error creating customer. Please try again.');
     }
   };
 
-  const handleUpdateCustomer = async (updatedCustomer: Customer) => {
-    setIsLoading(true);
+  const handleUpdateCustomer = async (customerId: string, customerData: any) => {
     try {
-      // API call would go here
-      setCustomers(customers.map(c => 
-        c.id === updatedCustomer.id 
-          ? { ...updatedCustomer, updatedAt: new Date().toISOString().split('T')[0] }
-          : c
-      ));
-      setSelectedCustomer(null);
+      const response = await fetch(`/api/customers/${customerId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(customerData)
+      });
+      
+      if (response.ok) {
+        const updatedCustomer = await response.json();
+        setCustomers(customers.map(c => c.id === customerId ? updatedCustomer : c));
+        setShowNewCustomerForm(false);
+        setEditingCustomer(null);
+        alert('Customer updated successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Error updating customer: ${error.error}`);
+      }
     } catch (error) {
       console.error('Error updating customer:', error);
-    } finally {
-      setIsLoading(false);
+      alert('Error updating customer. Please try again.');
     }
-  };
-
-  const handleDeleteCustomer = async (customerId: string) => {
-    if (window.confirm('Are you sure you want to delete this customer?')) {
-      setIsLoading(true);
-      try {
-        // API call would go here
-        setCustomers(customers.filter(c => c.id !== customerId));
-      } catch (error) {
-        console.error('Error deleting customer:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      companyName: '',
-      customerGroup: 'RETAIL',
-      billingAddress: {
-        street: '',
-        city: '',
-        state: '',
-        zipCode: ''
-      }
-    });
   };
 
   const handleEditCustomer = (customer: Customer) => {
     setEditingCustomer(customer);
-    setFormData({
-      firstName: customer.firstName || '',
-      lastName: customer.lastName || '',
-      email: customer.email || '',
-      phone: customer.phone || '',
-      companyName: customer.companyName || '',
-      customerGroup: customer.customerGroup,
-      billingAddress: customer.billingAddress || {
-        street: '',
-        city: '',
-        state: '',
-        zipCode: ''
-      }
-    });
+    setShowNewCustomerForm(true);
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingCustomer) return;
-    
-    setIsLoading(true);
-    try {
-      const updatedCustomer: Customer = {
-        ...editingCustomer,
-        ...formData,
-        updatedAt: new Date().toISOString().split('T')[0]
-      };
-      
-      setCustomers(customers.map(c => 
-        c.id === editingCustomer.id ? updatedCustomer : c
-      ));
-      setEditingCustomer(null);
-      resetForm();
-    } catch (error) {
-      console.error('Error updating customer:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingCustomer(null);
-    resetForm();
-  };
-
-  const handleCSVImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsLoading(true);
-    try {
-      const text = await file.text();
-      const rows = text.split('\n').filter(row => row.trim());
-      const headers = rows[0].split(',').map(h => h.replace(/"/g, '').trim());
-      
-      const newCustomers: Customer[] = [];
-      
-      for (let i = 1; i < rows.length; i++) {
-        const values = rows[i].split(',').map(v => v.replace(/"/g, '').trim());
-        const rowData: any = {};
-        
-        headers.forEach((header, idx) => {
-          rowData[header] = values[idx] || '';
+  const handleDeleteCustomer = async (customerId: string) => {
+    if (window.confirm('Are you sure you want to delete this customer?')) {
+      try {
+        const response = await fetch(`/api/customers/${customerId}`, {
+          method: 'DELETE',
         });
-
-        // Skip if no contact name
-        if (!rowData.ContactName && !rowData.FirstName && !rowData.LastName) continue;
-
-        // Parse the contact data
-        const contactName = rowData.ContactName || '';
-        const names = contactName.includes(' ') ? contactName.split(' ') : [contactName];
-        const firstName = rowData.FirstName || names[0] || '';
-        const lastName = rowData.LastName || (names.length > 1 ? names.slice(1).join(' ') : '');
-
-        const newCustomer: Customer = {
-          id: `csv_${Date.now()}_${i}`,
-          userId: `csv_user_${Date.now()}_${i}`,
-          firstName,
-          lastName,
-          email: rowData.EmailAddress || '',
-          phone: rowData.PhoneNumber || rowData.MobileNumber || '',
-          companyName: contactName.includes(' - ') ? contactName : undefined,
-          customerGroup: 'LEVEL_3_RESURFACING', // Level 3 - Resurfacing customers
-          billingAddress: {
-            street: rowData.POAddressLine1 || '',
-            city: rowData.POCity || '',
-            state: rowData.PORegion || '',
-            zipCode: rowData.POZipCode || rowData.POPostalCode || ''
-          },
-          createdAt: new Date().toISOString().split('T')[0],
-          updatedAt: new Date().toISOString().split('T')[0],
-          orders: [],
-          invoices: []
-        };
-
-        newCustomers.push(newCustomer);
+        if (response.ok) {
+          setCustomers(customers.filter(c => c.id !== customerId));
+        }
+      } catch (error) {
+        console.error('Error deleting customer:', error);
       }
-
-      setCustomers([...customers, ...newCustomers]);
-      
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      
-      alert(`Successfully imported ${newCustomers.length} customers as Level 3 - Resurfacing contractors`);
-    } catch (error) {
-      console.error('Error importing CSV:', error);
-      alert('Error importing CSV file. Please check the format.');
-    } finally {
-      setIsLoading(false);
     }
+  };
+
+  const loadProspects = async () => {
+    try {
+      const response = await fetch('/api/support-tickets?status=OPEN');
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableProspects(data.tickets);
+      }
+    } catch (error) {
+      console.error('Error loading prospects:', error);
+    }
+  };
+
+  const handleConvertProspect = async (prospectTicket: any) => {
+    try {
+      const response = await fetch('/api/prospects/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          customerId: prospectTicket.customer.id,
+          ticketId: prospectTicket.id 
+        })
+      });
+      
+      if (response.ok) {
+        // Refresh customers list
+        const customersResponse = await fetch('/api/customers');
+        if (customersResponse.ok) {
+          const data = await customersResponse.json();
+          setCustomers(data.customers);
+        }
+        
+        setShowConvertProspectModal(false);
+        alert(`${prospectTicket.customer.user.firstName} ${prospectTicket.customer.user.lastName} has been converted to a customer!`);
+      } else {
+        const error = await response.json();
+        alert(`Error converting prospect: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error converting prospect:', error);
+      alert('Error converting prospect. Please try again.');
+    }
+  };
+
+  const openConvertProspectModal = () => {
+    loadProspects();
+    setShowConvertProspectModal(true);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
-              <p className="text-gray-600">Manage your customer relationships and contact information</p>
+              <p className="text-gray-600 mt-1">Manage your customer relationships and contacts</p>
             </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => fileInputRef.current?.click()}
-                className="bg-green-600 text-white px-4 py-2 hover:bg-green-700 flex items-center gap-2 border border-green-600"
-                disabled={isLoading}
+            <div className="flex space-x-2">
+              <button
+                onClick={openConvertProspectModal}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
               >
-                <ArrowUpTrayIcon className="h-4 w-4" />
-                Import CSV
+                <PlusIcon className="w-5 h-5" />
+                <span>Convert Prospect</span>
               </button>
-              <button 
+              <button
                 onClick={() => setShowNewCustomerForm(true)}
-                className="bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 flex items-center gap-2 border border-blue-600"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
               >
-                <PlusIcon className="h-4 w-4" />
-                New Customer
+                <PlusIcon className="w-5 h-5" />
+                <span>Add Customer</span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <div className="relative flex-1">
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search customers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="flex gap-2">
+            <select
+              value={filterGroup}
+              onChange={(e) => setFilterGroup(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">All Groups</option>
+              <option value="RETAIL">Retail</option>
+              <option value="CONTRACTOR">Contractor</option>
+              <option value="DEALER">Dealer</option>
+              <option value="WHOLESALE">Wholesale</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Customer List */}
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-6">
-        <div className="bg-white shadow-lg border border-gray-200 p-6">
-          <div className="text-2xl font-bold text-blue-600">{customers.length}</div>
-          <div className="text-sm text-gray-600">Total Customers</div>
-        </div>
-        <div className="bg-white shadow-lg border border-gray-200 p-6">
-          <div className="text-2xl font-bold text-green-600">
-            {customers.filter(c => c.customerGroup === 'CONTRACTOR').length}
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="text-gray-500">Loading customers...</div>
           </div>
-          <div className="text-sm text-gray-600">Contractors</div>
-        </div>
-        <div className="bg-white shadow-lg border border-gray-200 p-6">
-          <div className="text-2xl font-bold text-purple-600">
-            {customers.filter(c => c.customerGroup === 'RETAIL').length}
-          </div>
-          <div className="text-sm text-gray-600">Retail Customers</div>
-        </div>
-        <div className="bg-white shadow-lg border border-gray-200 p-6">
-          <div className="text-2xl font-bold text-orange-600">
-            {customers.filter(c => new Date(c.createdAt) > new Date(Date.now() - 30*24*60*60*1000)).length}
-          </div>
-          <div className="text-sm text-gray-600">New This Month</div>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-            <div className="relative flex-1">
-              <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Search customers..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 pr-3"
-              />
-            </div>
-            <div className="flex gap-2">
-              <select 
-                value={filterGroup}
-                onChange={(e) => setFilterGroup(e.target.value)}
-                className="border border-gray-300 text-sm px-3 py-2"
-              >
-                <option value="">All Groups</option>
-                <option value="RETAIL">Retail</option>
-                <option value="CONTRACTOR">Contractor</option>
-                <option value="DEALER">Dealer</option>
-                <option value="WHOLESALE">Wholesale</option>
-                <option value="LEVEL_3_RESURFACING">Level 3 - Resurfacing</option>
-              </select>
-              <button className="px-3 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50">
-                <FunnelIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* New Customer Form */}
-        {showNewCustomerForm && (
-        <div className="bg-white shadow-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Add New Customer</h2>
-            <button 
-              onClick={() => {
-                setShowNewCustomerForm(false);
-                resetForm();
-              }}
-              className="text-gray-400 hover:text-gray-600"
+        ) : filteredCustomers.length === 0 ? (
+          <div className="text-center py-12">
+            <UserGroupIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No customers found</h3>
+            <p className="text-gray-500 mb-4">Get started by adding your first customer.</p>
+            <button
+              onClick={() => setShowNewCustomerForm(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             >
-              ×
+              Add Customer
             </button>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                <input 
-                  type="text" 
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                  className="w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                <input 
-                  type="text" 
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                  className="w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input 
-                  type="email" 
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                <input 
-                  type="tel" 
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  className="w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Company Name (Optional)</label>
-                <input 
-                  type="text" 
-                  value={formData.companyName}
-                  onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                  className="w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Customer Group</label>
-                <select 
-                  value={formData.customerGroup}
-                  onChange={(e) => setFormData({...formData, customerGroup: e.target.value as Customer['customerGroup']})}
-                  className="w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                >
-                  <option value="RETAIL">Retail</option>
-                  <option value="CONTRACTOR">Contractor</option>
-                  <option value="DEALER">Dealer</option>
-                  <option value="WHOLESALE">Wholesale</option>
-                  <option value="LEVEL_3_RESURFACING">Level 3 - Resurfacing</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                <div className="space-y-2">
-                  <input 
-                    type="text" 
-                    placeholder="Street Address"
-                    value={formData.billingAddress.street}
-                    onChange={(e) => setFormData({
-                      ...formData, 
-                      billingAddress: {...formData.billingAddress, street: e.target.value}
-                    })}
-                    className="w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input 
-                      type="text" 
-                      placeholder="City"
-                      value={formData.billingAddress.city}
-                      onChange={(e) => setFormData({
-                        ...formData, 
-                        billingAddress: {...formData.billingAddress, city: e.target.value}
-                      })}
-                      className="border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="State"
-                      value={formData.billingAddress.state}
-                      onChange={(e) => setFormData({
-                        ...formData, 
-                        billingAddress: {...formData.billingAddress, state: e.target.value}
-                      })}
-                      className="border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                    />
-                  </div>
-                  <input 
-                    type="text" 
-                    placeholder="ZIP Code"
-                    value={formData.billingAddress.zipCode}
-                    onChange={(e) => setFormData({
-                      ...formData, 
-                      billingAddress: {...formData.billingAddress, zipCode: e.target.value}
-                    })}
-                    className="w-full border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 flex justify-end gap-3">
-            <button 
-              onClick={() => {
-                setShowNewCustomerForm(false);
-                resetForm();
-              }}
-              className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={handleCreateCustomer}
-              disabled={isLoading || !formData.email}
-              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 border border-blue-600"
-            >
-              {isLoading ? 'Creating...' : 'Create Customer'}
-            </button>
-          </div>
-        </div>
-        )}
-
-        {/* Edit Customer Form */}
-        {editingCustomer && (
-          <div className="bg-white shadow-lg border border-gray-200 p-6 mb-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">Edit Customer</h2>
-              <button 
-                onClick={handleCancelEdit}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                  <input 
-                    type="text" 
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                    className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                  <input 
-                    type="text" 
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                    className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input 
-                    type="email" 
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                  <input 
-                    type="tel" 
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Company Name (Optional)</label>
-                  <input 
-                    type="text" 
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                    className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Customer Group</label>
-                  <select 
-                    value={formData.customerGroup}
-                    onChange={(e) => setFormData({...formData, customerGroup: e.target.value as Customer['customerGroup']})}
-                    className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  >
-                    <option value="RETAIL">Retail</option>
-                    <option value="CONTRACTOR">Contractor</option>
-                    <option value="DEALER">Dealer</option>
-                    <option value="WHOLESALE">Wholesale</option>
-                    <option value="LEVEL_3_RESURFACING">Level 3 - Resurfacing</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                  <div className="space-y-2">
-                    <input 
-                      type="text" 
-                      placeholder="Street Address"
-                      value={formData.billingAddress.street}
-                      onChange={(e) => setFormData({
-                        ...formData, 
-                        billingAddress: {...formData.billingAddress, street: e.target.value}
-                      })}
-                      className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                      <input 
-                        type="text" 
-                        placeholder="City"
-                        value={formData.billingAddress.city}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          billingAddress: {...formData.billingAddress, city: e.target.value}
-                        })}
-                        className="border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      />
-                      <input 
-                        type="text" 
-                        placeholder="State"
-                        value={formData.billingAddress.state}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          billingAddress: {...formData.billingAddress, state: e.target.value}
-                        })}
-                        className="border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                    <input 
-                      type="text" 
-                      placeholder="ZIP Code"
-                      value={formData.billingAddress.zipCode}
-                      onChange={(e) => setFormData({
-                        ...formData, 
-                        billingAddress: {...formData.billingAddress, zipCode: e.target.value}
-                      })}
-                      className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end gap-3">
-              <button 
-                onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleSaveEdit}
-                disabled={isLoading || !formData.email}
-                className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 border border-blue-600"
-              >
-                {isLoading ? 'Saving...' : 'Save Changes'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Customers List */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Customers ({filteredCustomers.length})</h2>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contact
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Location
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Group
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Invoices
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredCustomers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {customer.firstName} {customer.lastName}
-                      </div>
-                      {customer.companyName && (
-                        <div className="text-sm text-gray-500">{customer.companyName}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <EnvelopeIcon className="h-4 w-4" />
-                        {customer.email}
-                      </div>
-                      {customer.phone && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <PhoneIcon className="h-4 w-4" />
-                          {customer.phone}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {customer.billingAddress && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <MapPinIcon className="h-4 w-4" />
-                        <span>
-                          {customer.billingAddress.city}, {customer.billingAddress.state}
-                        </span>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${customerGroupColors[customer.customerGroup]}`}>
-                      {customer.customerGroup}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {customer.createdAt}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {customer.invoices && customer.invoices.length > 0 ? (
-                      <div className="space-y-1">
-                        {customer.invoices.map((invoice) => (
-                          <div key={invoice.id} className="flex items-center gap-2">
-                            <span className="text-blue-600 font-medium">{invoice.invoiceNumber}</span>
-                            <span className={`px-2 py-1 rounded-full text-xs ${
-                              invoice.status === 'Paid' ? 'bg-green-100 text-green-800' : 
-                              invoice.status === 'Awaiting Payment' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              {invoice.status}
-                            </span>
-                            <span className="text-gray-500">${invoice.total.toLocaleString()}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-gray-400">No invoices</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={() => setSelectedCustomer(customer)}
-                        className="text-blue-600 hover:text-blue-900" 
-                        title="View"
-                      >
-                        <EyeIcon className="h-4 w-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleEditCustomer(customer)}
-                        className="text-yellow-600 hover:text-yellow-900" 
-                        title="Edit"
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteCustomer(customer.id)}
-                        className="text-red-600 hover:text-red-900" 
-                        title="Delete"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
+        ) : (
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Contact
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Group
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Orders
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        </div>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredCustomers.map((customer) => (
+                  <tr key={customer.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <div className="text-sm font-medium text-gray-900">
+                            {getCustomerDisplayName(customer)}
+                          </div>
+                          {isRecentlyConverted(customer) && (
+                            <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              New Customer
+                            </span>
+                          )}
+                        </div>
+                        {customer.companyName && (
+                          <div className="text-sm text-gray-500">{customer.companyName}</div>
+                        )}
+                        {customer.metadata?.convertedFromProspect && (
+                          <div className="text-xs text-blue-600">
+                            Converted from prospect: {new Date(customer.metadata.conversionDate).toLocaleDateString()}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{customer.user.email}</div>
+                      {customer.user.phone && (
+                        <div className="text-sm text-gray-500">{customer.user.phone}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${customerGroupColors[customer.customerGroup]}`}>
+                        {customer.customerGroup}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {customer._count?.orders || 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => setSelectedCustomer(customer)}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <EyeIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEditCustomer(customer)}
+                          className="text-yellow-600 hover:text-yellow-700"
+                        >
+                          <PencilIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCustomer(customer.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
-        {/* Customer Detail Modal */}
-      {selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white shadow-lg max-w-2xl w-full max-h-full overflow-y-auto border border-gray-300">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {selectedCustomer.firstName} {selectedCustomer.lastName}
-                </h2>
-                <button 
-                  onClick={() => setSelectedCustomer(null)}
+      {/* Convert Prospect Modal */}
+      {showConvertProspectModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Convert Prospect to Customer
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Select a prospect to convert to a customer. All their information will be preserved.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowConvertProspectModal(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ×
                 </button>
               </div>
-            </div>
-            
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-4">Contact Information</h3>
-                  <div className="space-y-3 text-sm">
-                    <div>
-                      <span className="text-gray-500">Email:</span>
-                      <span className="ml-2">{selectedCustomer.email}</span>
-                    </div>
-                    {selectedCustomer.phone && (
-                      <div>
-                        <span className="text-gray-500">Phone:</span>
-                        <span className="ml-2">{selectedCustomer.phone}</span>
-                      </div>
-                    )}
-                    {selectedCustomer.companyName && (
-                      <div>
-                        <span className="text-gray-500">Company:</span>
-                        <span className="ml-2">{selectedCustomer.companyName}</span>
-                      </div>
-                    )}
-                    <div>
-                      <span className="text-gray-500">Group:</span>
-                      <span className={`ml-2 px-2 py-1 rounded-full text-xs ${customerGroupColors[selectedCustomer.customerGroup]}`}>
-                        {selectedCustomer.customerGroup}
-                      </span>
-                    </div>
+              
+              <div className="space-y-3">
+                {availableProspects.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">No active prospects available for conversion.</p>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Prospects will appear here when they submit the contact form on your website.
+                    </p>
                   </div>
-                </div>
-
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-4">Address</h3>
-                  {selectedCustomer.billingAddress && (
-                    <div className="text-sm text-gray-600">
-                      <div>{selectedCustomer.billingAddress.street}</div>
-                      <div>
-                        {selectedCustomer.billingAddress.city}, {selectedCustomer.billingAddress.state} {selectedCustomer.billingAddress.zipCode}
+                ) : (
+                  availableProspects.map((prospect: any) => (
+                    <div key={prospect.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <h4 className="font-medium text-gray-900">
+                              {prospect.customer.user.firstName} {prospect.customer.user.lastName}
+                            </h4>
+                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800`}>
+                              {prospect.priority}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">{prospect.customer.user.email}</p>
+                          {prospect.customer.user.phone && (
+                            <p className="text-sm text-gray-600">{prospect.customer.user.phone}</p>
+                          )}
+                          <p className="text-sm text-gray-700 mt-2 font-medium">{prospect.subject}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Inquiry received: {new Date(prospect.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleConvertProspect(prospect)}
+                          className="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700 flex items-center space-x-1"
+                        >
+                          <PlusIcon className="w-4 h-4" />
+                          <span>Convert</span>
+                        </button>
                       </div>
                     </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-end gap-3">
-                <button 
-                  onClick={() => setSelectedCustomer(null)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  Close
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 border border-blue-600">
-                  Edit Customer
-                </button>
+                  ))
+                )}
               </div>
             </div>
           </div>
         </div>
-        )}
-        
-        {/* Hidden CSV File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".csv"
-          onChange={handleCSVImport}
-          className="hidden"
+      )}
+
+      {/* Customer Form Modal */}
+      {showNewCustomerForm && (
+        <CustomerFormModal
+          customer={editingCustomer}
+          onSubmit={editingCustomer ? 
+            (data: any) => handleUpdateCustomer(editingCustomer.id, data) : 
+            handleCreateCustomer
+          }
+          onClose={() => {
+            setShowNewCustomerForm(false);
+            setEditingCustomer(null);
+          }}
         />
+      )}
+    </div>
+  );
+}
+
+// Customer Form Modal Component
+interface CustomerFormModalProps {
+  customer?: Customer | null;
+  onSubmit: (data: any) => void;
+  onClose: () => void;
+}
+
+function CustomerFormModal({ customer, onSubmit, onClose }: CustomerFormModalProps) {
+  const [formData, setFormData] = useState({
+    firstName: customer?.user.firstName || '',
+    lastName: customer?.user.lastName || '',
+    email: customer?.user.email || '',
+    phone: customer?.user.phone || '',
+    companyName: customer?.companyName || '',
+    customerGroup: customer?.customerGroup || 'RETAIL',
+    taxId: customer?.taxId || '',
+    billingAddress: customer?.billingAddress ? JSON.stringify(customer.billingAddress, null, 2) : '',
+    shippingAddress: customer?.shippingAddress ? JSON.stringify(customer.shippingAddress, null, 2) : ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Parse JSON fields
+    let billingAddress = null;
+    let shippingAddress = null;
+    
+    try {
+      if (formData.billingAddress.trim()) {
+        billingAddress = JSON.parse(formData.billingAddress);
+      }
+      if (formData.shippingAddress.trim()) {
+        shippingAddress = JSON.parse(formData.shippingAddress);
+      }
+    } catch (error) {
+      alert('Invalid JSON in address fields. Please check your formatting.');
+      return;
+    }
+
+    onSubmit({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      companyName: formData.companyName || null,
+      customerGroup: formData.customerGroup,
+      taxId: formData.taxId || null,
+      billingAddress,
+      shippingAddress
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-lg font-medium text-gray-900">
+              {customer ? 'Edit Customer' : 'Add New Customer'}
+            </h3>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              ×
+            </button>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Customer Group
+                </label>
+                <select
+                  name="customerGroup"
+                  value={formData.customerGroup}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="RETAIL">Retail</option>
+                  <option value="CONTRACTOR">Contractor</option>
+                  <option value="DEALER">Dealer</option>
+                  <option value="WHOLESALE">Wholesale</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tax ID
+              </label>
+              <input
+                type="text"
+                name="taxId"
+                value={formData.taxId}
+                onChange={handleInputChange}
+                placeholder="Tax ID or EIN"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Billing Address (JSON format)
+              </label>
+              <textarea
+                name="billingAddress"
+                value={formData.billingAddress}
+                onChange={handleInputChange}
+                rows={3}
+                placeholder='{"street": "123 Main St", "city": "City", "state": "ST", "zip": "12345"}'
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Shipping Address (JSON format)
+              </label>
+              <textarea
+                name="shippingAddress"
+                value={formData.shippingAddress}
+                onChange={handleInputChange}
+                rows={3}
+                placeholder='{"street": "123 Main St", "city": "City", "state": "ST", "zip": "12345"}'
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                {customer ? 'Update Customer' : 'Create Customer'}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

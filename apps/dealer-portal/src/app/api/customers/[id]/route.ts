@@ -54,34 +54,62 @@ export async function GET(
   }
 }
 
-// PUT /api/customers/[id] - Update a specific customer
-export async function PUT(
+// PATCH /api/customers/[id] - Update a specific customer
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     const body = await request.json();
     
-    const customer = await prisma.customer.update({
+    // First update the user record
+    const customer = await prisma.customer.findUnique({
       where: { id: params.id },
+      include: { user: true }
+    });
+
+    if (!customer) {
+      return NextResponse.json(
+        { error: 'Customer not found' },
+        { status: 404 }
+      );
+    }
+
+    // Update user information
+    await prisma.user.update({
+      where: { id: customer.userId },
       data: {
         firstName: body.firstName,
         lastName: body.lastName,
-        companyName: body.companyName,
         email: body.email,
         phone: body.phone,
-        group: body.group,
-        status: body.status,
-        billingAddress: body.billingAddress,
-        shippingAddress: body.shippingAddress,
-        taxExempt: body.taxExempt,
-        creditLimit: body.creditLimit,
-        notes: body.notes,
-        metadata: body.metadata,
-      },
+      }
     });
 
-    return NextResponse.json(customer);
+    // Update customer information
+    const updatedCustomer = await prisma.customer.update({
+      where: { id: params.id },
+      data: {
+        companyName: body.companyName,
+        customerGroup: body.customerGroup,
+        billingAddress: body.billingAddress,
+        shippingAddress: body.shippingAddress,
+        taxId: body.taxId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true
+          }
+        }
+      }
+    });
+
+    return NextResponse.json(updatedCustomer);
   } catch (error) {
     console.error('Error updating customer:', error);
     
@@ -108,23 +136,35 @@ export async function PUT(
   }
 }
 
-// DELETE /api/customers/[id] - Delete a specific customer (soft delete by setting status to INACTIVE)
+// DELETE /api/customers/[id] - Delete a specific customer (soft delete by setting user status to INACTIVE)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Instead of hard delete, we'll deactivate the customer
-    const customer = await prisma.customer.update({
+    // Get customer to find associated user
+    const customer = await prisma.customer.findUnique({
       where: { id: params.id },
+      include: { user: true }
+    });
+
+    if (!customer) {
+      return NextResponse.json(
+        { error: 'Customer not found' },
+        { status: 404 }
+      );
+    }
+
+    // Instead of hard delete, we'll deactivate the user
+    await prisma.user.update({
+      where: { id: customer.userId },
       data: {
         status: 'INACTIVE'
       }
     });
 
     return NextResponse.json({ 
-      message: 'Customer deactivated successfully',
-      customer 
+      message: 'Customer deactivated successfully'
     });
   } catch (error) {
     console.error('Error deactivating customer:', error);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   DocumentTextIcon, 
   PlusIcon, 
@@ -14,6 +14,7 @@ import {
   SparklesIcon,
   ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
+import { Customer, getAllCustomers, getCustomerDisplayName, getCustomerEmail, getProjectAddress, getBillingContactName } from '../../data/customers';
 
 interface Quote {
   id: string;
@@ -36,68 +37,7 @@ interface Quote {
   };
 }
 
-const sampleQuotes: Quote[] = [
-  {
-    id: '1',
-    quoteNumber: 'Q-2025-001',
-    customerId: '1',
-    customer: 'Mike Johnson',
-    email: 'mike@email.com',
-    serviceLevel: 'Level 5 - Full Project Management',
-    estimatedPrice: 42500,
-    status: 'pending',
-    createdDate: '2025-01-28',
-    validUntil: '2025-02-28',
-    description: 'Premium pickleball court with custom graphics and landscape coordination',
-    propertyDetails: {
-      address: '123 Oak Street, Raleigh, NC',
-      spaceSize: '30x60 feet',
-      currentSurface: 'grass',
-      timeline: '6-8 weeks',
-      specialRequirements: 'Custom logo, LED lighting'
-    }
-  },
-  {
-    id: '2',
-    quoteNumber: 'Q-2025-002',
-    customerId: '2',
-    customer: 'Sarah Smith',
-    email: 'sarah@email.com',
-    serviceLevel: 'Level 3 - Coating & Lining Specialist',
-    estimatedPrice: 12500,
-    status: 'accepted',
-    createdDate: '2025-01-25',
-    validUntil: '2025-02-25',
-    description: 'Professional surface coating and line painting for existing concrete base',
-    propertyDetails: {
-      address: '456 Pine Ave, Cary, NC',
-      spaceSize: '20x44 feet',
-      currentSurface: 'concrete',
-      timeline: '2-3 weeks',
-      specialRequirements: 'Weather dependent scheduling'
-    }
-  },
-  {
-    id: '3',
-    quoteNumber: 'Q-2025-003',
-    customerId: '3',
-    customer: 'Robert Davis',
-    email: 'robert@email.com',
-    serviceLevel: 'Level 4 - Project Management + Finish',
-    estimatedPrice: 22000,
-    status: 'rejected',
-    createdDate: '2025-01-20',
-    validUntil: '2025-02-20',
-    description: 'Managed court construction with contractor coordination',
-    propertyDetails: {
-      address: '789 Maple Dr, Durham, NC',
-      spaceSize: '24x54 feet',
-      currentSurface: 'asphalt',
-      timeline: '4-5 weeks',
-      specialRequirements: 'Drainage improvements needed'
-    }
-  }
-];
+const sampleQuotes: Quote[] = [];
 
 const serviceLevels = [
   { value: 'level1', label: 'Level 1 - Free DIY Resources ($0)', price: 0 },
@@ -138,6 +78,7 @@ const getStatusIcon = (status: string) => {
 
 export default function QuotesPage() {
   const [quotes, setQuotes] = useState<Quote[]>(sampleQuotes);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [showNewQuoteForm, setShowNewQuoteForm] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
@@ -173,6 +114,12 @@ export default function QuotesPage() {
     serviceLevel: '',
     description: ''
   });
+
+  // Load all customers from shared data source
+  useEffect(() => {
+    const allCustomers = getAllCustomers();
+    setCustomers(allCustomers);
+  }, []);
 
   const filteredQuotes = quotes.filter(quote => {
     const matchesSearch = 
@@ -426,23 +373,75 @@ export default function QuotesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Customer Information</label>
-                <input 
-                  type="text" 
-                  placeholder="Customer Name"
-                  value={formData.customerName}
-                  onChange={(e) => setFormData({...formData, customerName: e.target.value})}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <input 
-                  type="email" 
-                  placeholder="Email Address"
-                  value={formData.customerEmail}
-                  onChange={(e) => setFormData({...formData, customerEmail: e.target.value})}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Customer *</label>
+                <select
+                  value={formData.customerId}
+                  onChange={(e) => {
+                    const selectedCustomer = customers.find(c => c.id === e.target.value);
+                    if (selectedCustomer) {
+                      const projectAddress = getProjectAddress(selectedCustomer);
+                      setFormData({
+                        ...formData,
+                        customerId: selectedCustomer.id,
+                        customerName: getCustomerDisplayName(selectedCustomer),
+                        customerEmail: getCustomerEmail(selectedCustomer),
+                        // Prefill project address from customer data
+                        propertyAddress: `${projectAddress.street}, ${projectAddress.city}, ${projectAddress.state} ${projectAddress.zipCode}`.trim()
+                      });
+                    } else {
+                      setFormData({
+                        ...formData,
+                        customerId: '',
+                        customerName: '',
+                        customerEmail: ''
+                      });
+                    }
+                  }}
+                  className="w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">Select a customer...</option>
+                  {customers.map(customer => (
+                    <option key={customer.id} value={customer.id}>
+                      {getCustomerDisplayName(customer)} - {getCustomerEmail(customer)}
+                      {customer.organizationType && customer.organizationType !== 'INDIVIDUAL' ? ` (${customer.organizationType})` : ''}
+                    </option>
+                  ))}
+                </select>
+                {formData.customerId && (() => {
+                  const selectedCustomer = customers.find(c => c.id === formData.customerId);
+                  return selectedCustomer ? (
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+                      <p className="text-sm font-medium text-blue-800">Selected Customer</p>
+                      <div className="text-sm text-blue-700 mt-1">
+                        <div><strong>{getCustomerDisplayName(selectedCustomer)}</strong></div>
+                        <div>Email: {getCustomerEmail(selectedCustomer)}</div>
+                        {selectedCustomer.primaryContact.phone && (
+                          <div>Phone: {selectedCustomer.primaryContact.phone}</div>
+                        )}
+                        {selectedCustomer.organizationType && selectedCustomer.organizationType !== 'INDIVIDUAL' && (
+                          <div>Type: {selectedCustomer.organizationType}</div>
+                        )}
+                        {selectedCustomer.projectAddress && (
+                          <div className="mt-1">
+                            <strong>Project Location:</strong><br/>
+                            {selectedCustomer.projectAddress.street}<br/>
+                            {selectedCustomer.projectAddress.city}, {selectedCustomer.projectAddress.state} {selectedCustomer.projectAddress.zipCode}
+                          </div>
+                        )}
+                        {selectedCustomer.billingContact && (
+                          <div className="mt-1">
+                            <strong>Billing Contact:</strong> {getBillingContactName(selectedCustomer)}
+                          </div>
+                        )}
+                        {selectedCustomer.notes && (
+                          <div className="mt-1 text-xs text-blue-600">
+                            <strong>Notes:</strong> {selectedCustomer.notes}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
               </div>
               <div>
                 <input 
@@ -535,7 +534,7 @@ export default function QuotesPage() {
             </button>
             <button 
               onClick={editingQuote ? handleSaveEdit : handleCreateQuote}
-              disabled={isLoading || !formData.customerName || !formData.customerEmail || !formData.serviceLevel}
+              disabled={isLoading || !formData.customerId || !formData.serviceLevel}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
               {isLoading ? (editingQuote ? 'Updating...' : 'Generating...') : (editingQuote ? 'Update Quote' : 'Generate Quote with AI')}
