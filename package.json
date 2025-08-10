@@ -1,12 +1,12 @@
 {
   "name": "4420courts-monorepo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "4420 Courts customer site and dealer portal monorepo",
   "scripts": {
     "dev:customer": "cd apps/customer-site && npm run dev",
     "dev:dealer": "cd apps/dealer-portal && npm run dev",
-    "build": "cd apps/customer-site && rm -rf .next && npm ci && npm run build",
+    "build": "cd apps/customer-site && npm ci && npm run build",
     "start": "cd apps/customer-site && npm start",
     "build:customer": "cd apps/customer-site && npm run build",
     "build:dealer": "cd apps/dealer-portal && npm run build",
