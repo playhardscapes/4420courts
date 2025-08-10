@@ -46,6 +46,7 @@ enum UserRole {
 }
 
 enum UserStatus {
+  LEAD
   ACTIVE
   INACTIVE
   SUSPENDED
@@ -67,6 +68,7 @@ model Customer {
   shippingAddress Json?
   taxId          String?
   customerGroup  CustomerGroup @default(RETAIL)
+  metadata       Json? // For storing lead data and other flexible info
   
   // Relationship tracking
   orders         Order[]
