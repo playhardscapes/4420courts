@@ -8,6 +8,22 @@ const nextConfig = {
     // Keep TypeScript checking enabled
     ignoreBuildErrors: false,
   },
+  // Optimize for production deployment
+  output: 'standalone',
+  // Prevent chunk corruption
+  experimental: {
+    outputFileTracingRoot: undefined,
+  },
+  // Ensure proper webpack configuration
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      };
+    }
+    return config;
+  },
 }
 
 module.exports = nextConfig
