@@ -33,10 +33,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session in localStorage
-    const savedUser = localStorage.getItem('4420courts-user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    // Check for existing session in localStorage (only on client)
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('4420courts-user');
+      if (savedUser) {
+        setUser(JSON.parse(savedUser));
+      }
     }
     setLoading(false);
   }, []);
@@ -53,7 +55,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           membershipLevel: 'monthly'
         };
         setUser(demoUser);
-        localStorage.setItem('4420courts-user', JSON.stringify(demoUser));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('4420courts-user', JSON.stringify(demoUser));
+        }
         return { success: true };
       } else {
         return { success: false, error: 'Invalid credentials. Try demo@4420courts.com / demo123' };
@@ -80,7 +84,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         membershipLevel: userData.membershipLevel || 'free'
       };
       setUser(newUser);
-      localStorage.setItem('4420courts-user', JSON.stringify(newUser));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('4420courts-user', JSON.stringify(newUser));
+      }
       return { success: true };
     } catch {
       return { success: false, error: 'Registration failed' };
@@ -89,7 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('4420courts-user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('4420courts-user');
+    }
   };
 
   const hasAccess = (requiredLevel: string): boolean => {
