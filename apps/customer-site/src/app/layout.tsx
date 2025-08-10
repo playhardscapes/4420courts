@@ -1,23 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import "./globals.css";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { AuthProvider } from "@/contexts/AuthContext";
+// import Navigation from "@/components/Navigation";
+// import Footer from "@/components/Footer";
+// import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-});
-
-const playfairDisplay = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-playfair-display',
-});
-
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  variable: '--font-orbitron',
 });
 
 export const metadata: Metadata = {
@@ -32,14 +22,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${playfairDisplay.variable} ${orbitron.variable} font-sans antialiased`}
-      >
-        <AuthProvider>
-          <Navigation />
-          <main>{children}</main>
-          <Footer />
-        </AuthProvider>
+      <body className={`${inter.variable} font-sans antialiased`}>
+        <main>{children}</main>
       </body>
     </html>
   );
