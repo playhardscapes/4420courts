@@ -1,5 +1,5 @@
 import Link from "next/link";
-import WhereIAmTodayWidget from "@/components/WhereIAmTodayWidget";
+// import WhereIAmTodayWidget from "@/components/WhereIAmTodayWidget";
 
 export default function Home() {
   return (
@@ -98,7 +98,10 @@ export default function Home() {
               See exactly where I am and what I'm working on today. No hiding, no excuses - just honest, quality work.
             </p>
           </div>
-          <WhereIAmTodayWidget />
+          <div className="bg-blue-600 text-white p-8 rounded-lg text-center">
+            <h3 className="text-xl font-bold mb-2">Transparency Widget</h3>
+            <p>Widget temporarily disabled for deployment testing</p>
+          </div>
         </div>
       </section>
 
