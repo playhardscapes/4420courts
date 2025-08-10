@@ -4,20 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "prebuild": "npx prisma generate --schema=../../prisma/schema.prisma --generator client",
     "build": "SKIP_ENV_VALIDATION=true next build",
-    "postbuild": "npx prisma generate --schema=../../prisma/schema.prisma --generator client",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "postinstall": "npx prisma generate --schema=../../prisma/schema.prisma --generator client"
+    "postinstall": "echo 'No postinstall needed'"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@prisma/client": "^6.12.0",
     "autoprefixer": "^10.4.21",
     "next": "15.3.3",
-    "prisma": "^6.12.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
