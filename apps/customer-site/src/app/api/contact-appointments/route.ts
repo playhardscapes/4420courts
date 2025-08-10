@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+
+// Force dynamic rendering to prevent build-time static analysis
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Lazy import Prisma to avoid build-time initialization
+    const { prisma } = await import('@/lib/prisma');
     const body = await request.json();
     
     // Create minimal user record (no password, no auth complexity)
