@@ -1,7 +1,4 @@
 {
-  "/api/customers/route": "app/api/customers/route.js",
-  "/api/support-tickets/route": "app/api/support-tickets/route.js",
   "/page": "app/page.js",
-  "/customers/page": "app/customers/page.js",
-  "/prospects/page": "app/prospects/page.js"
+  "/customers/page": "app/customers/page.js"
 }
