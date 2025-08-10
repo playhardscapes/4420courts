@@ -4,4 +4,3 @@ builder = "NIXPACKS"
 [deploy]
 workingDirectory = "apps/customer-site"
 startCommand = "npm start"
-healthcheckPath = "/api/health"
