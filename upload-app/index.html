@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4420 Courts - Upload Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        .status-bar {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .status-bar.ready {
+            background: #e8f5e8;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        
+        .upload-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .upload-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .config-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .config-input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            background: white;
+        }
+        
+        .config-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .results-section {
+            margin-top: 40px;
+            display: none;
+        }
+        
+        .results-section.visible {
+            display: block;
+        }
+        
+        .results-header {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .results-content {
+            background: #f8f9fa;
+            border: 2px solid #4caf50;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            padding: 0;
+        }
+        
+        .result-item {
+            padding: 25px;
+            border-bottom: 1px solid #ddd;
+            background: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .uploaded-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #6c757d;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        .copy-btn.copied {
+            background: #17a2b8;
+        }
+        
+        .features {
+            background: #e3f2fd;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .features h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #1976d2;
+        }
+        
+        @media (max-width: 768px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .upload-btn {
+                padding: 15px 30px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Play Hardscapes</h1>
+            <p>Multi-Brand Image Upload Tool for Court Specialists</p>
+        </div>
+        
+        <div class="status-bar ready">
+            <strong>✅ System Ready</strong> - Cloudinary connection configured and ready to upload
+        </div>
+        
+        <div class="config-section">
+            <h3>🔧 Upload Configuration</h3>
+            <div class="config-grid">
+                <input type="text" id="cloudName" class="config-input" value="dqgy5mfvd" placeholder="Cloud Name">
+                <select id="brandFolder" class="config-input" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <option value="4420courts">🏓 4420 Courts (Pickleball)</option>
+                    <option value="7836courts">🎾 7836 Courts (Tennis)</option>
+                    <option value="9450courts">🏀 9450 Courts (Basketball)</option>
+                    <option value="shared">🏢 Play Hardscapes (Shared)</option>
+                </select>
+            </div>
+            <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin-top: 15px;">
+                <strong>📂 Selected Folder:</strong> <span id="selectedFolderDisplay">playhardscapes-assets/4420courts/</span>
+                <br><br>
+                <strong>🏷️ Auto Tags:</strong> <span id="selectedTagsDisplay">4420courts, pickleball, playhardscapes</span>
+                <br>
+                <small style="color: #6c757d;">Files will be automatically organized and tagged based on your selection.</small>
+            </div>
+        </div>
+        
+        <div class="upload-section">
+            <button id="uploadBtn" class="upload-btn">
+                <span>📸</span>
+                <span>Open Upload Widget</span>
+            </button>
+        </div>
+        
+        <div class="features">
+            <h3>🚀 Upload Features Available</h3>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <strong>📁 Multiple Sources</strong><br>
+                    Local files, URLs, Camera, Google Drive, Dropbox
+                </div>
+                <div class="feature-item">
+                    <strong>✂️ Image Editing</strong><br>
+                    Built-in cropping and basic transformations
+                </div>
+                <div class="feature-item">
+                    <strong>📂 Brand Organization</strong><br>
+                    Choose from 4420, 7836, 9450 Courts or Shared assets
+                </div>
+                <div class="feature-item">
+                    <strong>🏷️ Smart Tagging</strong><br>
+                    Auto-tagged by brand (pickleball, tennis, basketball)
+                </div>
+                <div class="feature-item">
+                    <strong>🔗 Instant URLs</strong><br>
+                    Copy optimized URLs for immediate use
+                </div>
+                <div class="feature-item">
+                    <strong>📱 Mobile Friendly</strong><br>
+                    Works on desktop, tablet, and mobile devices
+                </div>
+            </div>
+        </div>
+        
+        <div id="resultsSection" class="results-section">
+            <div class="results-header">
+                📊 Upload Results
+            </div>
+            <div class="results-content" id="resultsContent">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/latest/global/all.js"></script>
+    
+    <script>
+        let uploadWidget;
+        let uploadCount = 0;
+        
+        // Get brand configuration
+        function getBrandConfig(brandFolder) {
+            const configs = {
+                '4420courts': {
+                    folder: 'playhardscapes-assets/4420courts',
+                    tags: ['4420courts', 'pickleball', 'playhardscapes'],
+                    caption: 'Uploaded via 4420 Courts Upload Tool',
+                    alt: 'Pickleball court surface or project image'
+                },
+                '7836courts': {
+                    folder: 'playhardscapes-assets/7836courts',
+                    tags: ['7836courts', 'tennis', 'playhardscapes'],
+                    caption: 'Uploaded via 7836 Courts Upload Tool',
+                    alt: 'Tennis court surface or project image'
+                },
+                '9450courts': {
+                    folder: 'playhardscapes-assets/9450courts',
+                    tags: ['9450courts', 'basketball', 'playhardscapes'],
+                    caption: 'Uploaded via 9450 Courts Upload Tool',
+                    alt: 'Basketball court surface or project image'
+                },
+                'shared': {
+                    folder: 'playhardscapes-assets/shared',
+                    tags: ['playhardscapes', 'shared', 'company'],
+                    caption: 'Uploaded via Play Hardscapes Upload Tool',
+                    alt: 'Play Hardscapes company asset'
+                }
+            };
+            return configs[brandFolder] || configs['4420courts'];
+        }
+        
+        // Initialize the widget
+        function initializeWidget() {
+            const cloudName = document.getElementById('cloudName').value;
+            const brandFolder = document.getElementById('brandFolder').value;
+            const brandConfig = getBrandConfig(brandFolder);
+            
+            uploadWidget = cloudinary.createUploadWidget({
+                cloudName: cloudName,
+                uploadPreset: '4420courts-uploads',
+                sources: ['local', 'url', 'camera', 'image_search', 'dropbox', 'google_drive', 'unsplash'],
+                multiple: true,
+                maxFiles: 20,
+                maxFileSize: 10000000, // 10MB for images
+                maxVideoFileSize: 100000000, // 100MB for videos
+                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'mp4', 'mov', 'avi', 'wmv'],
+                cropping: true,
+                showAdvancedOptions: true,
+                showCompletedButton: true,
+                folder: brandConfig.folder,
+                tags: brandConfig.tags,
+                context: {
+                    caption: brandConfig.caption,
+                    alt: brandConfig.alt
+                },
+                styles: {
+                    palette: {
+                        window: "#FFFFFF",
+                        windowBorder: "#667eea",
+                        tabIcon: "#667eea",
+                        menuIcons: "#5A616A",
+                        textDark: "#000000",
+                        textLight: "#FFFFFF",
+                        link: "#667eea",
+                        action: "#764ba2",
+                        inactiveTabIcon: "#999999",
+                        error: "#F44235",
+                        inProgress: "#667eea",
+                        complete: "#4caf50",
+                        sourceBg: "#f8f9fa"
+                    }
+                }
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    console.log('✅ Upload successful:', result.info);
+                    displayUploadResult(result.info);
+                }
+                
+                if (!error && result && result.event === "queues-end") {
+                    console.log('🎉 All uploads completed');
+                }
+                
+                if (error) {
+                    console.error('❌ Upload error:', error);
+                    let errorMessage = 'Upload failed: ';
+                    
+                    if (error.message && error.message.includes('Invalid upload preset')) {
+                        errorMessage += 'Upload preset not found. Please create an unsigned upload preset named "4420courts_uploads" in your Cloudinary console.';
+                    } else if (error.message && error.message.includes('401')) {
+                        errorMessage += 'Authentication failed. Check your cloud name and upload preset.';
+                    } else if (error.message && error.message.includes('400')) {
+                        errorMessage += 'Bad request. Please check your upload preset configuration.';
+                    } else {
+                        errorMessage += (error.message || 'Unknown error');
+                    }
+                    
+                    alert(errorMessage);
+                }
+            });
+        }
+        
+        // Display upload results
+        function displayUploadResult(info) {
+            uploadCount++;
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsSection.classList.add('visible');
+            
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+            
+            // Create image/video preview
+            let mediaElement = '';
+            if (info.resource_type === 'image') {
+                mediaElement = `<img src="${info.secure_url}" alt="${info.original_filename}" class="uploaded-image">`;
+            } else if (info.resource_type === 'video') {
+                mediaElement = `<video src="${info.secure_url}" controls class="uploaded-image"></video>`;
+            }
+            
+            // Create info grid
+            const infoItems = [
+                { label: '🔗 Direct URL', value: info.secure_url },
+                { label: '📝 Public ID', value: info.public_id },
+                { label: '📏 Dimensions', value: `${info.width} × ${info.height} px` },
+                { label: '📦 File Size', value: `${(info.bytes / 1024 / 1024).toFixed(2)} MB` },
+                { label: '🏷️ Format', value: info.format.toUpperCase() },
+                { label: '📅 Uploaded', value: new Date(info.created_at).toLocaleString() }
+            ];
+            
+            const infoGrid = infoItems.map((item, index) => `
+                <div class="info-item">
+                    <div class="info-label">${item.label}</div>
+                    <div class="info-value">${item.value}</div>
+                    <button class="copy-btn" onclick="copyToClipboard('${item.value.replace(/'/g, "\\'")}', this)">
+                        📋 Copy
+                    </button>
+                </div>
+            `).join('');
+            
+            resultItem.innerHTML = `
+                <h4 style="margin-bottom: 15px; color: #495057;">📷 Upload #${uploadCount}: ${info.original_filename}</h4>
+                ${mediaElement}
+                <div class="info-grid">
+                    ${infoGrid}
+                </div>
+            `;
+            
+            resultsContent.appendChild(resultItem);
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Copy to clipboard function
+        async function copyToClipboard(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                // Fallback
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = '📋 Copy';
+                }, 2000);
+            }
+        }
+        
+        // Test preset function
+        function testPreset(presetName) {
+            document.getElementById('uploadPreset').value = presetName;
+            uploadWidget = null; // Force reinitialize
+            alert(`Testing preset: ${presetName}. Try uploading now.`);
+        }
+        
+        // Event listeners
+        document.getElementById('uploadBtn').addEventListener('click', () => {
+            if (!uploadWidget) {
+                initializeWidget();
+            }
+            uploadWidget.open();
+        });
+        
+        // Update folder display
+        function updateFolderDisplay() {
+            const brandFolder = document.getElementById('brandFolder').value;
+            const brandConfig = getBrandConfig(brandFolder);
+            
+            document.getElementById('selectedFolderDisplay').textContent = brandConfig.folder + '/';
+            document.getElementById('selectedTagsDisplay').textContent = brandConfig.tags.join(', ');
+        }
+        
+        // Update configuration when inputs change
+        document.getElementById('cloudName').addEventListener('change', () => {
+            uploadWidget = null; // Force reinitialize
+        });
+        
+        document.getElementById('brandFolder').addEventListener('change', () => {
+            updateFolderDisplay();
+            uploadWidget = null; // Force reinitialize
+        });
+        
+        // Initialize widget on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateFolderDisplay();
+            initializeWidget();
+        });
+    </script>
+</body>
+</html>

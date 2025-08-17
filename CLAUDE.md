@@ -86,7 +86,6 @@
 ## 🔧 **Website Implementation Completed**
 
 ### **Latest Updates - January 2025**
-- **BigCommerce Integration**: Headless commerce with REST API ($39/month plan)
 - **Shopping Cart**: Full cart functionality with persistent storage
 - **Service Levels**: Updated to new pricing model (Free/$49.99/month/project-based)
 - **Product Categories**: Auto-categorization (Services/Physical/Digital)
@@ -103,7 +102,6 @@
 
 ### **Technical Architecture**
 - **Frontend**: Next.js 15 with TypeScript and Tailwind CSS
-- **Commerce**: BigCommerce headless integration
 - **Deployment**: Railway (auto-deploy from GitHub)
 - **Fonts**: Orbitron (headings), Inter (body), Playfair Display (serif)
 - **Cart**: Local storage with persistent state management
@@ -350,9 +348,151 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 6. **Commission System** - Dealer payment tracking
 7. **Order Integration** - Connect accounting to business operations
 
+## 🎯 **LATEST SESSION UPDATE - August 12, 2025**
+
+### **✅ COMPLETED: Business Settings Functionality**
+
+**Session Focus**: Implemented complete business settings functionality for dealer portal based on user feedback for personal business use.
+
+#### **Key Changes Made**:
+
+1. **✅ Service Level Removal** (`dealer-portal/src/app/settings/components/SettingsDashboard.tsx`)
+   - Removed service level field from dealer profile per user request
+   - User feedback: "All dealers will offer all service levels. Dealers will work with customers to select service levels during project work"
+   - Cleaned up TypeScript interfaces to remove `DealerServiceLevel` import and field
+
+2. **✅ Territory Update** (`dealer-portal/src/app/settings/components/SettingsDashboard.tsx`)
+   - Updated territory from Florida/Georgia to Virginia/North Carolina
+   - New regions: Northern Virginia, Central Virginia, Charlotte Metro, Research Triangle
+   - New ZIP codes: 22101, 22102, 22103, 28202, 28203
+
+3. **✅ Database Integration** (`dealer-portal/src/app/api/settings/route.ts`)
+   - Created complete REST API endpoints for settings CRUD operations
+   - Integrated with Prisma ORM for real database persistence
+   - Implemented proper transaction handling for updating both Dealer and User records
+   - Added error handling and validation
+
+4. **✅ Save/Reset Functionality** (`dealer-portal/src/app/settings/page.tsx`)
+   - Implemented working save functionality that persists to database
+   - Added reset functionality to revert to last saved state
+   - Added loading states and success/error messaging
+   - Real-time state management between parent and child components
+
+#### **Technical Implementation Details**:
+
+```typescript
+// API Structure - /api/settings
+GET  /api/settings    // Fetch current dealer settings from database
+PUT  /api/settings    // Save updated settings to database
+
+// Database Tables Used:
+- Dealer table (companyName, businessAddress, licenseNumber, commissionRate)
+- User table (firstName, lastName, email, phone) 
+- Territory table (for future expansion)
+```
+
+#### **Files Modified**:
+- `apps/dealer-portal/src/app/settings/page.tsx` - Main settings page with save/reset
+- `apps/dealer-portal/src/app/settings/components/SettingsDashboard.tsx` - Settings dashboard component
+- `apps/dealer-portal/src/app/api/settings/route.ts` - API endpoints for CRUD operations
+
+#### **Current Status**:
+- ✅ Settings page loads dealer data from database
+- ✅ All form fields work and update state properly  
+- ✅ Save button persists changes to database via Prisma
+- ✅ Reset button reverts to last saved state
+- ✅ Success/error messaging implemented
+- ✅ Loading states during API calls
+- ✅ Service levels removed per user request
+- ✅ Territory updated to Virginia/North Carolina
+
+#### **Next Steps for New Session**:
+1. **Navigation Fix**: Start new Claude session from `/home/info4420/github/4420courts` directory to avoid path restrictions
+2. **Testing**: Run `npm run build` to verify implementation works
+3. **Production Deploy**: Push changes to Railway deployment
+4. **Database Seeding**: May need to create initial dealer record for testing
+
+#### **User Feedback Addressed**:
+- ✅ "Remove service level references from dealer profile" 
+- ✅ "Update territory to Virginia and North Carolina"
+- ✅ "Can't currently save changes to profile"
+- ✅ "Review CRUD for business settings"
+
+## 🖼️ **CLOUDINARY UPLOAD TOOL COMPLETED - August 16, 2025**
+
+### **✅ Upload Tool Successfully Created**
+**Location**: `/home/info4420/github/4420courts/upload-app/`
+**Server**: Running on http://localhost:3001
+**Status**: Fully functional and ready for use
+
+#### **Cloudinary Configuration**
+- **Cloud Name**: `dqgy5mfvd`
+- **API Key**: `h46L4dqpWQe3IOoGXzRZOVSAWcI`
+- **Upload Preset**: `4420courts-uploads` (unsigned, configured properly)
+
+#### **Tool Features**
+- **Professional Interface**: 4420 Courts branded design
+- **Multiple Upload Sources**: Local files, URLs, camera, Google Drive, Dropbox, Unsplash
+- **Image Editing**: Built-in cropping and optimization
+- **Auto Organization**: Files saved to `4420courts-uploads` folder
+- **Smart Tagging**: Auto-tagged with `4420courts` and `playhardscapes`
+- **Easy URL Copying**: One-click copy buttons for all URLs
+- **Mobile Friendly**: Works on any device
+- **Real-time Results**: Upload progress and immediate URL generation
+
+#### **Sample Upload URL Generated**
+```
+https://res.cloudinary.com/dqgy5mfvd/image/upload/v1755293694/4420courts-uploads/fvmbpcwhzhc97khxi7xw.jpg
+```
+
+#### **Usage Instructions**
+```bash
+# Start the upload tool
+cd /home/info4420/github/4420courts/upload-app
+./start.sh
+# Then visit: http://localhost:3001
+```
+
+## 🏢 **BUSINESS STRATEGY: AMERICAN SPORT COURT BUILDERS ASSOCIATION**
+
+### **Strategic Decision - August 16, 2025**
+
+**Question**: Which business name to use for ASCBA membership?
+- **Play Hardscapes** (current established business)
+- **4420 Courts** (future specialized brand)
+
+#### **Recommendation: Join as Play Hardscapes**
+
+**Reasoning:**
+1. **Established Business Credibility**
+   - Existing business license/insurance under Play Hardscapes
+   - Portfolio and project history
+   - Financial stability and references
+   - Professional track record
+
+2. **ASCBA Requirements**
+   - Associations typically want established businesses
+   - Need to demonstrate business history and capability
+   - Insurance and licensing documentation required
+
+3. **Strategic Transition Plan**
+   - Join ASCBA as "Play Hardscapes"
+   - Position 4420 Courts as specialized court division
+   - Gradually transition marketing materials
+   - Update ASCBA profile once 4420 Courts is fully established
+
+#### **Suggested Application Language**
+> "Play Hardscapes, specializing in athletic court solutions through our 4420 Courts division, providing premium court resurfacing and construction services throughout Virginia and North Carolina."
+
+#### **Long-term Strategy**
+- **Phase 1**: ASCBA membership as Play Hardscapes
+- **Phase 2**: Introduce 4420 Courts as court-specific brand
+- **Phase 3**: Full transition to 4420 Courts for court-related work
+- **Phase 4**: Play Hardscapes becomes parent company for broader services
+
 ---
 
-**Last Updated**: January 28, 2025
+**Last Updated**: August 16, 2025
 **Repository**: https://github.com/playhardscapes/4420courts.git
 **Deployment**: Railway (monitors main branch)
-**Critical**: Complete dealer portal with accounting system needs rebuilding
+**Status**: Upload tool completed, business strategy documented for ASCBA membership

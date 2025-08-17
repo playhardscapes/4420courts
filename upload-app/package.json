@@ -1,0 +1,16 @@
+{
+  "name": "4420courts-upload-tool",
+  "version": "1.0.0",
+  "description": "Cloudinary Upload Tool for 4420 Courts",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": ["cloudinary", "upload", "4420courts"],
+  "author": "4420 Courts",
+  "license": "MIT"
+}

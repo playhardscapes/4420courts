@@ -1,8 +1,8 @@
 {
-  "name": "4420courts-monorepo",
+  "name": "4420courts-deployment-scripts",
   "version": "1.0.1",
   "private": true,
-  "description": "4420 Courts customer site and dealer portal monorepo",
+  "description": "Deployment scripts for 4420 Courts customer site and dealer portal applications",
   "scripts": {
     "dev:customer": "cd apps/customer-site && npm run dev",
     "dev:dealer": "cd apps/dealer-portal && npm run dev",
